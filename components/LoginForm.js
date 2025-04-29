@@ -3,18 +3,18 @@ import React, { useState } from "react";
 import styles from "./LoginForm.module.css";
 import Link from "next/link";
 import Swal from "sweetalert2";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { doLogin } from "@/app/action";
 
 const LoginForm = () => {
-  const [userID, setUserID] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter();
+  // const router = useRouter();
 
   async function handleSubmit(event) {
     event.preventDefault();
-    const response = await doLogin({ userID, password });
+    const response = await doLogin({ email, password });
     // console.log("from login form ####################"+JSON.stringify(response));
     if (!response.success) {
       Swal.fire({
@@ -49,12 +49,12 @@ const LoginForm = () => {
         />
         <form onSubmit={handleSubmit}>
           <input
-            type="text"
-            id="userID"
-            name="userID"
-            placeholder="User ID"
-            value={userID}
-            onChange={(e) => setUserID(e.target.value)}
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <input
             type="password"
