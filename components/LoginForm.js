@@ -8,12 +8,13 @@ import Image from "next/image";
 import { doLogin } from "@/app/action";
 
 const LoginForm = () => {
-  const [email, setemail] = useState("");
+  const [userID, setUserID] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   async function handleSubmit(event) {
     event.preventDefault();
-    const response = await doLogin({ email, password });
+    const response = await doLogin({ userID, password });
     // console.log("from login form ####################"+JSON.stringify(response));
     if (!response.success) {
       Swal.fire({
@@ -48,12 +49,12 @@ const LoginForm = () => {
         />
         <form onSubmit={handleSubmit}>
           <input
-            type="email"
-            id="email"
-            name="email"
+            type="text"
+            id="userID"
+            name="userID"
             placeholder="User ID"
-            value={email}
-            onChange={(e) => setemail(e.target.value)}
+            value={userID}
+            onChange={(e) => setUserID(e.target.value)}
           />
           <input
             type="password"
