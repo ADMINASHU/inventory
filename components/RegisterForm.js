@@ -52,7 +52,7 @@ const RegisterForm = () => {
         />
         <form onSubmit={handleSubmit}>
           <input
-            type="text"
+            type="email"
             id="email"
             name="email"
             placeholder="Email"
