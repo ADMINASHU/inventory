@@ -11,10 +11,10 @@ export async function doLogout() {
   await signOut({ redirect: true, redirectTo: "/login" });
 }
 
-export async function doLogin({ userID, password }) {
+export async function doLogin({ email, password }) {
   try {
     const result = SignInSchema.safeParse({
-      userID,
+      email,
       password,
     });
 
@@ -44,7 +44,6 @@ export async function doLogin({ userID, password }) {
 
 export const signUp = async ({ data }) => {
   const result = RegisterSchema.safeParse({
-    userID: data.userID,
     email: data.email,
     password: data.password,
     confirmPassword: data.confirmPassword,
@@ -55,11 +54,10 @@ export const signUp = async ({ data }) => {
   }
 
   try {
-    const { userID, email, password } = result.data;
+    const { email, password } = result.data;
 
-    const existingUserID = await prisma.users.findUnique({ where: { userID } });
     const existingUserEmail = await prisma.users.findUnique({ where: { email } });
-    if (existingUserID || existingUserEmail) {
+    if ( existingUserEmail) {
       return { error: "User already exists" };
     }
 
@@ -68,7 +66,7 @@ export const signUp = async ({ data }) => {
 
     const newUser = await prisma.users.create({
       data: {
-        userID,
+    
         email,
         password: hashedPassword,
         isAdmin: false,
