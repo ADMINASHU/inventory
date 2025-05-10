@@ -4,7 +4,7 @@ import connectToServiceEaseDB from "../../../lib/serviceDB";
 
 export async function PUT(request) {
   const {
-    userID,
+  
     fName,
     eName,
     image,
@@ -21,7 +21,7 @@ export async function PUT(request) {
     await connectToServiceEaseDB();
 
     const user = await User.findOneAndUpdate(
-      { userID },
+      { email }, // Find user by email
       {
         $set: {
           fName,
@@ -50,10 +50,10 @@ export async function PUT(request) {
 }
 export async function POST(request) {
   try {
-    const { userID } = await request.json();
+    const { email } = await request.json();
     // console.log("From profile/ post : " + userID);
     await connectToServiceEaseDB();
-    const user = await User.findOne({ userID });
+    const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }

@@ -61,9 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       const isAuthRoute = AUTH_ROUTES.find((route) => nextUrl.pathname.startsWith(route));
       const isAuthApiRoute = AUTH_API_ROUTES.find((route) => nextUrl.pathname.startsWith(route));
-      const isLevel1Route = LEVEL1_ROUTES.find((route) => nextUrl.pathname.startsWith(route));
-      const isLevel2Route = LEVEL2_ROUTES.find((route) => nextUrl.pathname.startsWith(route));
-      const isLevel3Route = LEVEL3_ROUTES.find((route) => nextUrl.pathname.startsWith(route));
+ 
       const isVerifiedRoute = VERIFIED_ROUTES.find((route) => nextUrl.pathname.startsWith(route));
 
       if (isAuthApiRoute) {
@@ -77,17 +75,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (isVerifiedRoute && !isVerified) {
         return NextResponse.redirect(new URL(UNAUTHORIZED, nextUrl));
       }
-      if (isAuthenticated && isVerified) {
-        if (isLevel1Route && level > 1) {
-          return NextResponse.redirect(new URL(UNAUTHORIZED, nextUrl));
-        }
-        if (isLevel2Route && level > 2) {
-          return NextResponse.redirect(new URL(UNAUTHORIZED, nextUrl));
-        }
-        if (isLevel3Route && level > 3) {
-          return NextResponse.redirect(new URL(UNAUTHORIZED, nextUrl));
-        }
-      }
+  
       return NextResponse.next();
     },
     jwt({ token, user }) {

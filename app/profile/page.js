@@ -5,7 +5,7 @@ import styles from "../../components/Profile.module.css";
 
 const ProfilePage = async () => {
   const session = await auth();
-  const LoggedUserID = session?.user.userID;
+  const LoggedUserID = session?.user.email;
 
   return (
     <div className={styles.profileContainer}>

@@ -64,14 +64,14 @@ export default function Navbar({ isAuthenticated, loggedUser }) {
             className={styles.logo}
           />
         </Link>
-        {level > 1 && (
+    
           <Link
-            href="/my-report"
-            className={pathname === "/my-report" ? styles.activeLink : styles.nlink}
+            href="/list"
+            className={pathname === "/list" ? styles.activeLink : styles.nlink}
           >
-            My Report
+            List
           </Link>
-        )}
+        
         <Link
           href=""
           className={
@@ -106,11 +106,11 @@ export default function Navbar({ isAuthenticated, loggedUser }) {
         )}
    
 
-        {level <= 3 && (
+      
           <Link href="/users" className={pathname === "/users" ? styles.activeLink : styles.nlink}>
             Users
           </Link>
-        )}
+     
 
         {level <= 1 && (
           <Link

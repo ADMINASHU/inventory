@@ -4,10 +4,10 @@ import connectToServiceEaseDB from "../../../../lib/serviceDB";
 
 export async function DELETE(request, { params }) {
   try {
-    const { userID } = params;
+    const { email } = params;
 
     await connectToServiceEaseDB();
-    const user = await User.findOneAndDelete({ userID });
+    const user = await User.findOneAndDelete({ email });
 
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });

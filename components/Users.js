@@ -1,12 +1,10 @@
 "use client";
-import React, { useContext } from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { regionList } from "@/lib/regions";
 import axios from "axios";
 import Swal from "sweetalert2";
 import styles from "./Users.module.css";
 import Image from "next/image";
-import DataContext from "@/context/DataContext";
 
 const Users = ({ LoggedUserLevel, LoggedUser }) => {
   const [users, setUsers] = useState([]);
@@ -14,7 +12,7 @@ const Users = ({ LoggedUserLevel, LoggedUser }) => {
   const [loading, setLoading] = useState(true);
   const [editFormVisible, setEditFormVisible] = useState(false);
   const [formData, setFormData] = useState({
-    userID: "",
+  
     fName: "",
     eName: "",
     email: "",
@@ -27,13 +25,11 @@ const Users = ({ LoggedUserLevel, LoggedUser }) => {
     verified: false,
   });
 
-  const { processedData } = useContext(DataContext);
-
   const filteredBranches = !formData.region
-    ? Array.from(new Set(processedData.map((row) => row.branch)))
+    ? Array.from(new Set(users.map((row) => row.branch)))
     : Array.from(
         new Set(
-          processedData.filter((row) => row.region === formData.region).map((row) => row.branch)
+          users.filter((row) => row.region === formData.region).map((row) => row.branch)
         )
       );
       
@@ -64,14 +60,14 @@ const Users = ({ LoggedUserLevel, LoggedUser }) => {
 
   const handleDelete = async (userID) => {
     try {
-      const response = await axios.delete(`/api/users/${userID}`);
+      const response = await axios.delete(`/api/users/${email}`);
       Swal.fire({
         title: "Success!",
         text: response.data.message,
         icon: "success",
         confirmButtonText: "OK",
       });
-      setUsers(users.filter((user) => user.userID !== userID));
+      setUsers(users.filter((user) => user.email !== email));
     } catch (error) {
       console.error(error);
       Swal.fire({
@@ -303,7 +299,7 @@ const Users = ({ LoggedUserLevel, LoggedUser }) => {
           <thead>
             <tr>
               <th>S No</th>
-              <th>User ID</th>
+              
               <th>Name</th>
               <th>Email</th>
               <th>Mobile No</th>
@@ -325,7 +321,7 @@ const Users = ({ LoggedUserLevel, LoggedUser }) => {
                 >
                   {index + 1}
                 </td>
-                <td>{user.userID}</td>
+                
                 <td>{`${user?.fName || ""} ${user?.eName || ""}`}</td>
                 <td>{user.email}</td>
                 <td>{user.mobileNo}</td>
