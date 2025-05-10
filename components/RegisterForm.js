@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import { signUp } from "@/app/action";
 
 const RegisterForm = () => {
+  const [userID, setUserID] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -17,7 +18,7 @@ const RegisterForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const data = { email, password, confirmPassword };
+    const data = { userID, email, password, confirmPassword };
     const response = await signUp({ data });
 
     if (response.error) {
@@ -52,7 +53,15 @@ const RegisterForm = () => {
         />
         <form onSubmit={handleSubmit}>
           <input
-            type="email"
+            type="text"
+            id="userID"
+            name="userID"
+            placeholder="User ID"
+            value={userID}
+            onChange={(e) => setUserID(e.target.value)}
+          />
+          <input
+            type="text"
             id="email"
             name="email"
             placeholder="Email"

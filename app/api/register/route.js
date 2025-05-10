@@ -12,15 +12,15 @@ export async function POST(request) {
     }
     const data = await request.json();
     // console.log("from server register" +JSON.stringify(data));
-    const { email, password } = data;
+    const { userID, email, password } = data;
     const isAdmin = false;
 
-    if ( !email || !password) {
+    if (!userID || !email || !password) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
     // Check if user already exists
-    const existingUser = await User.findOne({email});
+    const existingUser = await User.findOne({ userID });
     if (existingUser) {
       return NextResponse.json({ error: "User already exists" }, { status: 400 });
     }
@@ -31,6 +31,7 @@ export async function POST(request) {
 
     // Create a new user
     const newUser = new User({
+      userID,
       email,
       password: hashedPassword,
       isAdmin,

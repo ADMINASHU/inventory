@@ -33,12 +33,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
       credentials: {
-        email: {},
+        userID: {},
         password: {},
       },
       authorize: async (credentials) => {
-        const { email, password } = credentials;
-        const user = await prisma.users.findUnique({ where: { email } });
+        const { userID, password } = credentials;
+        const user = await prisma.users.findUnique({ where: { userID } });
         if (!user || !user.password) {
           throw new Error("User not found");
         }
@@ -93,7 +93,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     jwt({ token, user }) {
       if (user) {
         const newToken = {
-          email: user.email,
+          userID: user.userID,
           isAdmin: user.isAdmin,
           level: user.level,
           verified: user.verified,

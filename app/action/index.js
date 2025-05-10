@@ -6,14 +6,15 @@ import { SignInSchema, RegisterSchema } from "@/lib/zod";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
 
+
 export async function doLogout() {
   await signOut({ redirect: true, redirectTo: "/login" });
 }
 
-export async function doLogin({ email, password }) {
+export async function doLogin({ userID, password }) {
   try {
     const result = SignInSchema.safeParse({
-      email,
+      userID,
       password,
     });
 
@@ -24,7 +25,7 @@ export async function doLogin({ email, password }) {
     await signIn("credentials", {
       ...result.data,
       // redirect: true,
-      redirectTo: "/",
+      redirectTo:"/",
     });
 
     // return { success: true, message: "Signin successful" };
@@ -43,6 +44,7 @@ export async function doLogin({ email, password }) {
 
 export const signUp = async ({ data }) => {
   const result = RegisterSchema.safeParse({
+    userID: data.userID,
     email: data.email,
     password: data.password,
     confirmPassword: data.confirmPassword,
@@ -53,20 +55,20 @@ export const signUp = async ({ data }) => {
   }
 
   try {
-    const { email, password } = result.data;
+    const { userID, email, password } = result.data;
 
-    const existingUserEmail = await prisma.users.findUnique({ where: { email: email } });
-    if (existingUserEmail) {
+    const existingUserID = await prisma.users.findUnique({ where: { userID } });
+    const existingUserEmail = await prisma.users.findUnique({ where: { email } });
+    if (existingUserID || existingUserEmail) {
       return { error: "User already exists" };
     }
-
-    console.log(JSON.stringify(existingUserEmail));
 
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
 
     const newUser = await prisma.users.create({
       data: {
+        userID,
         email,
         password: hashedPassword,
         isAdmin: false,
@@ -75,7 +77,7 @@ export const signUp = async ({ data }) => {
 
     return { message: "User registered successfully" };
   } catch (error) {
-    console.log(error.message);
     return { error: error.message };
   }
+  
 };
