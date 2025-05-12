@@ -19,7 +19,7 @@ import {
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   pages: {
-    signIn: "/login",
+    // signIn: "/login",
     // error: "/login",
   },
   session: {
@@ -74,6 +74,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
+      
+    async signIn({ account, profile }) {
+      if (account.provider === "google") {
+        return profile.email_verified;
+      }
+      return true;
+    },
+  
     authorized({ auth, request: { nextUrl } }) {
       const isAuthenticated = !!auth?.user;
       const isVerified = auth?.user?.verified;
