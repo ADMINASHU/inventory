@@ -79,3 +79,14 @@ export const signUp = async ({ data }) => {
   }
   
 };
+
+export async function doGoogleSignIn(params) {
+  try {
+    await signIn("google", {
+      ...params,
+      redirectTo: "/",
+    });
+  } catch (error) {
+    return { error: error.message };
+  }
+}

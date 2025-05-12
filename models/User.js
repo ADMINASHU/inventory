@@ -9,7 +9,7 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: false, // allow OAuth users without password
   },
   isAdmin: {
     type: Boolean,
@@ -27,6 +27,8 @@ const UserSchema = new mongoose.Schema({
   mobileNo: { type: String },
   resetToken: { type: String },
   resetTokenExpiry: { type: Date },
+  provider: { type: String },
+  providerAccountId: { type: String },
 });
 
 // Prevents redefining the model during hot reloading

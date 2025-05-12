@@ -10,7 +10,7 @@ datasource db {
 model users {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
   email     String @unique
-  password  String
+  password  String? // <-- make optional for OAuth
   isAdmin   Boolean @default(false)
   level     Int     @default(4)
   verified  Boolean @default(false)
@@ -23,6 +23,8 @@ model users {
   mobileNo  String?
   resetToken String?
   resetTokenExpiry DateTime?
+  provider  String? // <-- add this for OAuth
+  providerAccountId String? // <-- add this for OAuth
 }
 
 

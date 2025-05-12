@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google"
 import { NextResponse } from "next/server";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "@/lib/prismaClient";
@@ -10,9 +11,6 @@ import {
   LOGIN,
   PROTECTED_ROUTES,
   VERIFIED_ROUTES,
-  LEVEL1_ROUTES,
-  LEVEL2_ROUTES,
-  LEVEL3_ROUTES,
   UNAUTHORIZED,
   AUTH_ROUTES,
   AUTH_API_ROUTES,
@@ -22,7 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   pages: {
     signIn: "/login",
-    error: "/login",
+    // error: "/login",
   },
   session: {
     strategy: "jwt",
@@ -46,6 +44,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!isValidPassword) return null;
 
         return user;
+      },
+    }),
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
+      profile(profile) {
+        return {
+          id: profile.sub,
+          email: profile.email,
+          name: profile.name,
+          image: profile.picture,
+          isAdmin: false,
+          level: 4,
+          verified: true,
+          fName: profile.given_name || profile.name || "User",
+          eName: "",
+          provider: "google",
+          providerAccountId: profile.sub,
+        };
       },
     }),
   ],
@@ -80,19 +104,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     jwt({ token, user }) {
       if (user) {
-        const newToken = {
-          isAdmin: user.isAdmin,
-          level: user.level,
-          verified: user.verified,
-          fName: user.fName,
-          eName: user.eName,
-        };
-        token = { ...token, ...newToken };
+        token.isAdmin = user.isAdmin ?? false;
+        token.level = user.level ?? 4;
+        token.verified = user.verified ?? true;
+        token.fName = user.fName ?? user.name ?? "User";
+        token.eName = user.eName ?? "";
+        token.email = user.email;
+        token.image = user.image;
+        token.provider = user.provider ?? "credentials";
+        token.providerAccountId = user.providerAccountId ?? "";
       }
       return token;
     },
     session({ session, token }) {
-      session.user = token;
+      session.user = {
+        ...session.user,
+        isAdmin: token.isAdmin,
+        level: token.level,
+        verified: token.verified,
+        fName: token.fName,
+        eName: token.eName,
+        email: token.email,
+        image: token.image,
+        provider: token.provider,
+        providerAccountId: token.providerAccountId,
+      };
       return session;
     },
   },

@@ -5,7 +5,8 @@ import Link from "next/link";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { doLogin } from "@/app/action";
+import { doLogin, doGoogleSignIn } from "@/app/action";
+import SignIn from "./SignIn";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -34,6 +35,7 @@ const LoginForm = () => {
     //   });
     // }
   }
+
 
   return (
     <div className={styles.container}>
@@ -65,18 +67,21 @@ const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           <button type="submit">Sign in</button>
-          <p>
-            <Link href="/forgot-password" className={styles.forgotPasswordLink}>
-              Forgot Password?
-            </Link>
-          </p>
-          <p>
-            Don&apos;t have an account?
-            <Link href="/register" className={styles.signupLink}>
-              Register
-            </Link>
-          </p>
         </form>
+
+        <SignIn />
+
+        <p>
+          <Link href="/forgot-password" className={styles.forgotPasswordLink}>
+            Forgot Password?
+          </Link>
+        </p>
+        <p>
+          Don&apos;t have an account?
+          <Link href="/register" className={styles.signupLink}>
+            Register
+          </Link>
+        </p>
       </div>
     </div>
   );
