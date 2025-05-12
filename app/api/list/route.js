@@ -47,12 +47,16 @@ export async function PUT(request) {
 }
 
 export async function DELETE(request) {
-  await connectToServiceEaseDB();
-  const body = await parseBody(request);
-  const { _id } = body;
   try {
+    await connectToServiceEaseDB();
+    const body = await parseBody(request);
+    const { _id } = body;
+    if (!_id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
     await List.findByIdAndDelete(_id);
-    return NextResponse.json({}, { status: 204 });
+    // Use status 200 with an empty object for JSON response (204 is not valid for JSON)
+    return NextResponse.json({});
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }

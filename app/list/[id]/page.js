@@ -1,10 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "@/components/(List)/List.module.css";
 
 const ListDetailsPage = (props) => {
   // Unwrap params using React.use()
   const { id } = React.use(props.params);
+  const router = useRouter();
 
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +31,13 @@ const ListDetailsPage = (props) => {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
+        <button
+          className={styles.pageBtn}
+          onClick={() => router.push("/list")}
+          style={{ marginBottom: 12 }}
+        >
+          Back to List
+        </button>
         <h2 style={{ marginBottom: 8 }}>{item.partName}</h2>
         <div><b>Category:</b> {item.category}</div>
         <div><b>Description:</b> {item.description}</div>
