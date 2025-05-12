@@ -1,34 +1,44 @@
 "use client"
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import ListHeader from './ListHeader';
-import ListTable from './ListTable';
-import PaginationCard from './PaginationCard';
-import ListForm from './ListForm';
-import styles from './List.module.css';
+import UsersHeader from './UsersHeader';
+import UsersTable from './UsersTable';
+import PaginationCard from '../(List)/PaginationCard';
+import UserForm from './UserForm';
+import styles from './Users.module.css';
 
 const PAGE_SIZE = 20;
 
-const List = () => {
+const Users = () => {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
+  const [role, setRole] = useState('');
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState(null);
+  const [editUser, setEditUser] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
   const fetchData = useCallback(async () => {
-    const res = await fetch('/api/list');
-    if (res.ok) setData(await res.json());
+    const res = await fetch('/api/users');
+    if (res.ok) {
+      const json = await res.json();
+      // Ensure data is always an array
+      setData(Array.isArray(json) ? json : (json?.users || []));
+    }
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const filtered = useMemo(() =>
-    data.filter(item =>
-      (!category || item.category === category) &&
-      (!search || item.partName.toLowerCase().includes(search.toLowerCase()))
-    ), [data, category, search]
+    Array.isArray(data)
+      ? data.filter(user =>
+          (!role || user.role === role) &&
+          (!search ||
+            (`${user.fName || ""} ${user.eName || ""}`.toLowerCase().includes(search.toLowerCase()) ||
+            user.email?.toLowerCase().includes(search.toLowerCase()))
+          )
+        )
+      : [],
+    [data, role, search]
   );
   const total = filtered.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -44,53 +54,53 @@ const List = () => {
   const pageNumbers = [];
   for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
 
-  const handleAdd = () => { setEditItem(null); setModalOpen(true); };
+  const handleAdd = () => { setEditUser(null); setModalOpen(true); };
   const handleEdit = () => {
-    const item = data.find(i => (i._id || data.indexOf(i)) === selectedId);
-    setEditItem(item); setModalOpen(true);
+    const user = data.find(u => (u._id || data.indexOf(u)) === selectedId);
+    setEditUser(user); setModalOpen(true);
   };
   const handleDelete = async () => {
-    const item = data.find(i => (i._id || data.indexOf(i)) === selectedId);
-    if (!item) return;
-    if (!window.confirm('Delete this part?')) return;
-    await fetch('/api/list', {
+    const user = data.find(u => (u._id || data.indexOf(u)) === selectedId);
+    if (!user) return;
+    if (!window.confirm('Delete this user?')) return;
+    await fetch('/api/users', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ _id: item._id }),
+      body: JSON.stringify({ _id: user._id }),
     });
     setSelectedId(null);
     fetchData();
   };
-  const handleSave = async (item) => {
-    if (editItem && editItem._id) {
-      await fetch('/api/list', {
+  const handleSave = async (user) => {
+    if (editUser && editUser._id) {
+      await fetch('/api/users', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...item, _id: editItem._id }),
+        body: JSON.stringify({ ...user, _id: editUser._id }),
       });
     } else {
-      await fetch('/api/list', {
+      await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item),
+        body: JSON.stringify(user),
       });
     }
     setModalOpen(false);
-    setEditItem(null);
+    setEditUser(null);
     setSelectedId(null);
     fetchData();
   };
 
   return (
     <div className={styles.container}>
-      <ListHeader
-        category={category}
-        setCategory={setCategory}
+      <UsersHeader
+        role={role}
+        setRole={setRole}
         search={search}
         setSearch={setSearch}
         onAdd={handleAdd}
       />
-      <ListTable
+      <UsersTable
         paginated={paginated}
         selectedId={selectedId}
         setSelectedId={setSelectedId}
@@ -107,14 +117,14 @@ const List = () => {
         pageNumbers={pageNumbers}
         totalPages={totalPages}
       />
-      <ListForm
+      <UserForm
         open={modalOpen}
-        onClose={() => { setModalOpen(false); setEditItem(null); }}
+        onClose={() => { setModalOpen(false); setEditUser(null); }}
         onSave={handleSave}
-        initial={editItem}
+        initial={editUser}
       />
     </div>
   );
 }
 
-export default List
+export default Users;

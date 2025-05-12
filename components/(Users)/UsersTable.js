@@ -1,27 +1,31 @@
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import styles from './List.module.css';
+import styles from './Users.module.css';
 
-const ListTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) => {
-  const router = useRouter();
-  return (
-    <div className={styles.card}>
+const UsersTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) => (
+  <div className={styles.card}>
+    <div className={styles.tableWrapper}>
       <table className={styles.table}>
         <thead>
           <tr>
             <th>S No</th>
-            <th>Part Name</th>
-            <th>Category</th>
-            <th>Description</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile No</th>
+            <th>Designation</th>
+            <th>Branch</th>
+            <th>Region</th>
+            <th>Level</th>
+            <th>Verified</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           {paginated.length === 0 ? (
             <tr>
-              <td colSpan={4} style={{ textAlign: 'center', padding: 16 }}>No data found.</td>
+              <td colSpan={10} style={{ textAlign: 'center', padding: 16 }}>No data found.</td>
             </tr>
-          ) : paginated.map((item, idx) => {
-            const rowId = item._id || idx;
+          ) : paginated.map((user, idx) => {
+            const rowId = user._id || idx;
             const isSelected = selectedId === rowId;
             return (
               <tr
@@ -33,18 +37,22 @@ const ListTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) =
                   cursor: 'pointer'
                 }}
                 onClick={() => setSelectedId(isSelected ? null : rowId)}
-                onDoubleClick={e => {
-                  e.stopPropagation();
-                  if (item._id) {
-                    router.push(`/list/${item._id}`);
-                  }
-                }}
               >
                 <td>{idx + 1}</td>
-                <td>{item.partName}</td>
-                <td>{item.category}</td>
+                <td>{`${user.fName || ''} ${user.eName || ''}`}</td>
+                <td>{user.email}</td>
+                <td>{user.mobileNo}</td>
+                <td>{user.designation}</td>
+                <td>{user.branch}</td>
+                <td>{user.region}</td>
+                <td>{user.level ? `Level ${user.level}` : ''}</td>
+                <td style={{
+                  color: user.verified ? "green" : "red",
+                  textAlign: "center"
+                }}>
+                  {user.verified ? "Verified" : "Blocked"}
+                </td>
                 <td style={{ position: 'relative' }}>
-                  {item.description}
                   {isSelected && (
                     <span
                       className={styles.rowActions}
@@ -78,7 +86,7 @@ const ListTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) =
         </tbody>
       </table>
     </div>
-  );
-};
+  </div>
+);
 
-export default ListTable;
+export default UsersTable;

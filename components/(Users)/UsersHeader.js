@@ -1,32 +1,33 @@
 import React from 'react';
-import styles from './List.module.css';
+import styles from './Users.module.css';
 
-const ListHeader = ({ category, setCategory, search, setSearch, onAdd }) => (
+const UsersHeader = ({ role, setRole, search, setSearch, onAdd }) => (
   <div className={styles.card}>
     <div className={styles.header}>
       <div className={styles.filters}>
         <select
-          value={category}
-          onChange={e => setCategory(e.target.value)}
+          value={role}
+          onChange={e => setRole(e.target.value)}
           className={styles.select}
         >
-          <option value="">All Categories</option>
-          <option value="Passive">Passive</option>
-          <option value="Active">Active</option>
+          <option value="">All Roles</option>
+          <option value="admin">Admin</option>
+          <option value="user">User</option>
+          {/* Add more roles as needed */}
         </select>
         <input
           type="text"
-          placeholder="Search part name..."
+          placeholder="Search name or email..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           className={styles.input}
         />
       </div>
       <button className={styles.addBtn} onClick={onAdd}>
-        Add List
+        Add User
       </button>
     </div>
   </div>
 );
 
-export default ListHeader;
+export default UsersHeader;

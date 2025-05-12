@@ -7,14 +7,16 @@ const ListDetails = ({ id, onBack }) => {
 
   useEffect(() => {
     if (!id) return;
+    let ignore = false;
     const fetchItem = async () => {
       const res = await fetch(`/api/list?id=${id}`);
       if (res.ok) {
         const data = await res.json();
-        setItem(Array.isArray(data) ? data[0] : data);
+        if (!ignore) setItem(Array.isArray(data) ? data[0] : data);
       }
     };
     fetchItem();
+    return () => { ignore = true; };
   }, [id]);
 
   if (!id) return null;

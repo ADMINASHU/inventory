@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import styles from "@/components/(List)/List.module.css";
 
 const ListDetailsPage = (props) => {
-  // Unwrap params using React.use()
+  // Unwrap params using React.use() for future compatibility
   const { id } = React.use(props.params);
   const router = useRouter();
 
@@ -13,16 +13,15 @@ const ListDetailsPage = (props) => {
 
   useEffect(() => {
     if (!id) return;
-    const fetchItem = async () => {
-      setLoading(true);
-      const res = await fetch(`/api/list?id=${id}`);
-      if (res.ok) {
-        const data = await res.json();
-        setItem(data);
-      }
-      setLoading(false);
-    };
-    fetchItem();
+    let ignore = false;
+    setLoading(true);
+    fetch(`/api/list?id=${id}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (!ignore) setItem(data);
+        setLoading(false);
+      });
+    return () => { ignore = true; };
   }, [id]);
 
   if (loading) return <div className={styles.card}>Loading...</div>;
