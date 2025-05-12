@@ -5,10 +5,10 @@ const ListSchema = new mongoose.Schema(
     partName: { type: String, required: true },
     category: { type: String, required: true },
     description: { type: String },
-    inventory: [
+    counts: [
       {
-        account: [{ type: String, required: true }],
-        count: [{ type: Number, required: true }],
+        account: { type: String, required: true },
+        count: { type: Number, required: true },
       },
     ],
   },

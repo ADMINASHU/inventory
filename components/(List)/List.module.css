@@ -85,6 +85,18 @@
   background: #f0f7ff;
 }
 
+.selectedRow:hover .rowActions,
+.selectedRow .rowActions {
+  display: flex !important;
+}
+
+.rowActions {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  /* The rest is set inline for position */
+}
+
 .pagination {
   display: flex;
   align-items: center;
