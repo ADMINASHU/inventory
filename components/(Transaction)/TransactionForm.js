@@ -122,27 +122,15 @@ const TransactionForm = ({ open, onClose, onSave, initial }) => {
               <input className={styles.input} placeholder="To" value={to} onChange={e => setTo(e.target.value)} required />
               <input className={styles.input} placeholder="Created By" value={createdBy} onChange={e => setCreatedBy(e.target.value)} required />
               <input className={styles.input} placeholder="Transaction Status" value={transactionStatus} onChange={e => setTransactionStatus(e.target.value)} required />
-              <div className={styles.checkboxRow}>
-                <label>
-                  <input type="checkbox" checked={isDeleted} onChange={e => setIsDeleted(e.target.checked)} />
-                  <span style={{ marginLeft: 6 }}>Is Deleted</span>
-                </label>
-                <label>
-                  <input type="checkbox" checked={isApproved} onChange={e => setIsApproved(e.target.checked)} />
-                  <span style={{ marginLeft: 6 }}>Is Approved</span>
-                </label>
-              </div>
-              <input className={styles.input} placeholder="Approved By" value={approvedBy} onChange={e => setApprovedBy(e.target.value)} />
-              <input className={styles.input} type="datetime-local" placeholder="Approved At" value={approvedAt} onChange={e => setApprovedAt(e.target.value)} />
             </div>
             <textarea className={styles.input} placeholder="Note" value={note} onChange={e => setNote(e.target.value)} rows={2} />
-            <div style={{ marginTop: 8, fontWeight: 500, color: '#1976d2' }}>
-              Total: {total}
-            </div>
           </div>
 
           <div className={styles.section}>
-            <div className={styles.sectionTitle}>Items</div>
+            <div className={styles.sectionTitleRow}>
+              <div className={styles.sectionTitle}>Items</div>
+              <div className={styles.totalInline}>Total: {total}</div>
+            </div>
             <div className={styles.itemListView}>
               <div className={styles.itemListHeader}>
                 <span>Part ID</span>

@@ -259,6 +259,20 @@
   margin-bottom: 6px;
 }
 
+.sectionTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.totalInline {
+  font-weight: 500;
+  color: #1976d2;
+  font-size: 1.08em;
+  margin-left: 16px;
+}
+
 .grid2col {
   display: grid;
   grid-template-columns: 1fr 1fr;
