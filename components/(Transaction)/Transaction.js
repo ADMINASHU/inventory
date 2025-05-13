@@ -54,12 +54,15 @@ const Transaction = () => {
   for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
 
   const handleAdd = () => { setEditItem(null); setModalOpen(true); };
-  const handleEdit = () => {
-    const item = data.find(i => (i._id || data.indexOf(i)) === selectedId);
-    setEditItem(item); setModalOpen(true);
+  const handleEdit = (id) => {
+    setSelectedId(id);
+    const item = data.find(i => (i._id || data.indexOf(i)) === id);
+    setEditItem(item);
+    setModalOpen(true);
   };
-  const handleDelete = async () => {
-    const item = data.find(i => (i._id || data.indexOf(i)) === selectedId);
+  const handleDelete = async (id) => {
+    setSelectedId(id);
+    const item = data.find(i => (i._id || data.indexOf(i)) === id);
     if (!item) return;
     if (!window.confirm('Delete this part?')) return;
     await fetch('/api/transaction', {

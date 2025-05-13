@@ -202,13 +202,13 @@ const TransactionForm = ({ open, onClose, onSave, initial, parts = [] }) => {
                       ))}
                   </select>
                   {/* Part ID (auto-filled, read-only) */}
-                  <input
+                  {/* <input
                     className={styles.input}
                     type="text"
                     placeholder="Part ID"
                     value={item.partId || ''}
                     readOnly
-                  />
+                  /> */}
                   {/* Count */}
                   <input
                     className={styles.input}

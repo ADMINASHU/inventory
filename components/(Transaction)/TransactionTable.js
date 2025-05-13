@@ -55,8 +55,16 @@ const TransactionTable = ({ paginated, selectedId, setSelectedId, onEdit, onDele
                 <td className={styles.td}>{txn.to}</td>
                 <td className={styles.td}>{txn.transactionStatus}</td>
                 <td className={styles.td}>
-                  <button className={styles.iconBtn} type="button" onClick={e => { e.stopPropagation(); onEdit(); }}>✏️</button>
-                  <button className={styles.iconBtn} type="button" onClick={e => { e.stopPropagation(); onDelete(); }}>🗑️</button>
+                  <button
+                    className={styles.iconBtn}
+                    type="button"
+                    onClick={e => { e.stopPropagation(); onEdit(txn._id || idx); }}
+                  >✏️</button>
+                  <button
+                    className={styles.iconBtn}
+                    type="button"
+                    onClick={e => { e.stopPropagation(); onDelete(txn._id || idx); }}
+                  >🗑️</button>
                 </td>
               </tr>
             ))
