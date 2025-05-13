@@ -46,13 +46,11 @@ export default function Navbar({ isAuthenticated, loggedUser }) {
     setDashOpen(!dashOpen);
   };
 
-
   if (!isAuthenticated) {
     return null;
   }
   return (
     <nav className={styles.navbar}>
-     
       <div className={styles.navLinks}>
         <Link href="/" className={pathname === "/" ? styles.activeLink : ""}>
           <Image
@@ -64,62 +62,25 @@ export default function Navbar({ isAuthenticated, loggedUser }) {
             className={styles.logo}
           />
         </Link>
-    
-          <Link
-            href="/list"
-            className={pathname === "/list" ? styles.activeLink : styles.nlink}
-          >
-            List
-          </Link>
-        
-        <Link
-          href=""
-          className={
-            pathname === "/dashboard/engineer" ||
-            pathname === "/dashboard/branch" ||
-            pathname === "/dashboard/region" ||
-            pathname === "/dashboard/product" ||
-            pathname === "/dashboard/customer"
-              ? styles.activeLink
-              : styles.nlink
-          }
-          onClick={toggleDash}
-        >
-          {`Dashboard ${
-            pathname === "/dashboard/engineer" ||
-            pathname === "/dashboard/branch" ||
-            pathname === "/dashboard/region" ||
-            pathname === "/dashboard/product" ||
-            pathname === "/dashboard/customer"
-              ? pathname
-                  .split("/")[2]
-                  .toLowerCase()
-                  .replace(/\b\w/g, (char) => char.toUpperCase())
-              : ""
-          } ${dashOpen ? "▴" : "▾"} `}
+
+        <Link href="/list" className={pathname === "/list" ? styles.activeLink : styles.nlink}>
+          List
         </Link>
 
-        {level <= 1 && (
-          <Link href="/data" className={pathname === "/data" ? styles.activeLink : styles.nlink}>
-            Data
-          </Link>
-        )}
-   
+        <Link
+          href="/transaction"
+          className={pathname === "/transaction" ? styles.activeLink : styles.nlink}
+        >
+          Transaction
+        </Link>
 
-      
-          <Link href="/users" className={pathname === "/users" ? styles.activeLink : styles.nlink}>
-            Users
-          </Link>
-     
+        <Link href="/stock" className={pathname === "/stock" ? styles.activeLink : styles.nlink}>
+          Stock
+        </Link>
 
-        {level <= 1 && (
-          <Link
-            href="/control"
-            className={pathname === "/control" ? styles.activeLink : styles.nlink}
-          >
-            Control
-          </Link>
-        )}
+        <Link href="/users" className={pathname === "/users" ? styles.activeLink : styles.nlink}>
+          Users
+        </Link>
       </div>
       <div className={styles.profileSection}>
         <Link href="/profile" className={styles.profileContainer}>
@@ -199,18 +160,18 @@ export default function Navbar({ isAuthenticated, loggedUser }) {
             }
             onClick={toggleDash}
           >
-             {`Dashboard ${
-            pathname === "/dashboard/engineer" ||
-            pathname === "/dashboard/branch" ||
-            pathname === "/dashboard/region" ||
-            pathname === "/dashboard/product" ||
-            pathname === "/dashboard/customer"
-              ? pathname
-                  .split("/")[2]
-                  .toLowerCase()
-                  .replace(/\b\w/g, (char) => char.toUpperCase())
-              : ""
-          } ${dashOpen ? "▴" : "▾"} `}
+            {`Dashboard ${
+              pathname === "/dashboard/engineer" ||
+              pathname === "/dashboard/branch" ||
+              pathname === "/dashboard/region" ||
+              pathname === "/dashboard/product" ||
+              pathname === "/dashboard/customer"
+                ? pathname
+                    .split("/")[2]
+                    .toLowerCase()
+                    .replace(/\b\w/g, (char) => char.toUpperCase())
+                : ""
+            } ${dashOpen ? "▴" : "▾"} `}
           </Link>
           {dashOpen && (
             <div className={styles.newResponsiveDash}>
