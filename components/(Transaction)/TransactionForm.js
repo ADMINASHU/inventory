@@ -81,7 +81,25 @@ const TransactionForm = ({ open, onClose, onSave, initial, parts = [] }) => {
     if (open && initial) {
       setTransactionId(initial.transactionId || '');
       setDate(initial.date ? initial.date.slice(0, 10) : '');
-      setItems(initial.items && initial.items.length > 0 ? initial.items : [{ ...emptyItem }]);
+      // Populate category and partName from partId (_id) for each item
+      setItems(
+        initial.items && initial.items.length > 0
+          ? initial.items.map(item => {
+              if (item.partId || item._id) {
+                const part = parts.find(
+                  p => p._id === (item.partId || item._id)
+                );
+                return {
+                  ...item,
+                  partId: item.partId || item._id || '',
+                  category: part ? part.category : item.category || '',
+                  partName: part ? part.partName : item.partName || '',
+                };
+              }
+              return { ...emptyItem };
+            })
+          : [{ ...emptyItem }]
+      );
       setTransactionMethod(initial.transactionMethod || '');
       setTransactionType(initial.transactionType || '');
       setFrom(initial.from || '');
@@ -113,7 +131,7 @@ const TransactionForm = ({ open, onClose, onSave, initial, parts = [] }) => {
       setApprovedAt('');
       setUpdateHistory([]);
     }
-  }, [open, initial]);
+  }, [open, initial, parts]);
 
   // Update total automatically when items change
   useEffect(() => {
