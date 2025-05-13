@@ -40,7 +40,7 @@ const TransactionTable = ({ paginated, selectedId, setSelectedId, onEdit, onDele
                   <ul className={styles.itemList}>
                     {txn.items && txn.items.map((item, i) => (
                       <li key={i}>
-                        <span className={styles.itemPartId}>{item.partId}</span>
+                        <span className={styles.itemPartId}>{item._id}</span>
                         {item.partName && <> - <span>{item.partName}</span></>}
                         {item.category && <> (<span>{item.category}</span>)</>}
                         : <span className={styles.itemCount}>{item.count}</span>

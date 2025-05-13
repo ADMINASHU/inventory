@@ -6,7 +6,7 @@ const TransactionSchema = new mongoose.Schema(
     date: { type: Date, required: true },
     items: [
       {
-        partId: { type: String, required: true },
+        _id : { type: mongoose.Schema.Types.ObjectId, auto: false },
         count: { type: Number, required: true },
       },
     ],

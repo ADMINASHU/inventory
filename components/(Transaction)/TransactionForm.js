@@ -39,7 +39,7 @@ function FloatingLabelTextarea({ label, value, onChange, required, ...props }) {
   );
 }
 
-const emptyItem = { partId: '', count: 0, partName: '', category: '' };
+const emptyItem = { _id: '', count: 0, partName: '', category: '' };
 const emptyAttachment = { name: '', type: '', id: 0 };
 
 const TransactionForm = ({ open, onClose, onSave, initial, parts = [] }) => {
@@ -135,7 +135,7 @@ const TransactionForm = ({ open, onClose, onSave, initial, parts = [] }) => {
             field === 'category' ? value : newItem.category,
             field === 'partName' ? value : newItem.partName
           );
-          newItem.partId = partId || '';
+          newItem._id = partId || '';
         }
         return newItem;
       });
