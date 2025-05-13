@@ -1,6 +1,44 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styles from './Transaction.module.css';
 
+// Floating label input component
+function FloatingLabelInput({ label, value, onChange, type = "text", required, ...props }) {
+  return (
+    <div className={styles.floatingInputWrapper}>
+      <input
+        className={styles.floatingInput}
+        type={type}
+        value={value}
+        onChange={onChange}
+        required={required}
+        autoComplete="off"
+        {...props}
+      />
+      <label className={`${styles.floatingLabel} ${value ? styles.floatingLabelActive : ''}`}>
+        {label}
+      </label>
+    </div>
+  );
+}
+
+function FloatingLabelTextarea({ label, value, onChange, required, ...props }) {
+  return (
+    <div className={styles.floatingInputWrapper}>
+      <textarea
+        className={styles.floatingInput}
+        value={value}
+        onChange={onChange}
+        required={required}
+        rows={2}
+        {...props}
+      />
+      <label className={`${styles.floatingLabel} ${value ? styles.floatingLabelActive : ''}`}>
+        {label}
+      </label>
+    </div>
+  );
+}
+
 const emptyItem = { partId: '', count: 0, partName: '', category: '' };
 const emptyAttachment = { name: '', type: '', id: 0 };
 
@@ -147,17 +185,16 @@ const TransactionForm = ({ open, onClose, onSave, initial, parts = [] }) => {
           <div className={styles.section}>
             <div className={styles.sectionTitle}>Transaction Info</div>
             <div className={styles.grid2col}>
-              <input className={styles.input} placeholder="Transaction ID" value={transactionId} onChange={e => setTransactionId(e.target.value)} required />
-              <input className={styles.input} type="date" placeholder="Date" value={date} onChange={e => setDate(e.target.value)} required />
-              {/* Removed total input */}
-              <input className={styles.input} placeholder="Transaction Method" value={transactionMethod} onChange={e => setTransactionMethod(e.target.value)} required />
-              <input className={styles.input} placeholder="Transaction Type" value={transactionType} onChange={e => setTransactionType(e.target.value)} required />
-              <input className={styles.input} placeholder="From" value={from} onChange={e => setFrom(e.target.value)} required />
-              <input className={styles.input} placeholder="To" value={to} onChange={e => setTo(e.target.value)} required />
-              <input className={styles.input} placeholder="Created By" value={createdBy} onChange={e => setCreatedBy(e.target.value)} required />
-              <input className={styles.input} placeholder="Transaction Status" value={transactionStatus} onChange={e => setTransactionStatus(e.target.value)} required />
+              <FloatingLabelInput label="Transaction ID" value={transactionId} onChange={e => setTransactionId(e.target.value)} required />
+              <FloatingLabelInput label="Date" type="date" value={date} onChange={e => setDate(e.target.value)} required />
+              <FloatingLabelInput label="Transaction Method" value={transactionMethod} onChange={e => setTransactionMethod(e.target.value)} required />
+              <FloatingLabelInput label="Transaction Type" value={transactionType} onChange={e => setTransactionType(e.target.value)} required />
+              <FloatingLabelInput label="From" value={from} onChange={e => setFrom(e.target.value)} required />
+              <FloatingLabelInput label="To" value={to} onChange={e => setTo(e.target.value)} required />
+              <FloatingLabelInput label="Created By" value={createdBy} onChange={e => setCreatedBy(e.target.value)} required />
+              <FloatingLabelInput label="Transaction Status" value={transactionStatus} onChange={e => setTransactionStatus(e.target.value)} required />
             </div>
-            <textarea className={styles.input} placeholder="Note" value={note} onChange={e => setNote(e.target.value)} rows={2} />
+            <FloatingLabelTextarea label="Note" value={note} onChange={e => setNote(e.target.value)} />
           </div>
 
           <div className={styles.section}>
@@ -201,20 +238,11 @@ const TransactionForm = ({ open, onClose, onSave, initial, parts = [] }) => {
                         <option key={name} value={name}>{name}</option>
                       ))}
                   </select>
-                  {/* Part ID (auto-filled, read-only) */}
-                  {/* <input
-                    className={styles.input}
-                    type="text"
-                    placeholder="Part ID"
-                    value={item.partId || ''}
-                    readOnly
-                  /> */}
                   {/* Count */}
                   <input
                     className={styles.input}
                     type="number"
                     min={0}
-                    placeholder="Count"
                     value={item.count ?? 0}
                     onChange={e => handleItemChange(idx, 'count', Number(e.target.value))}
                     required
@@ -243,9 +271,25 @@ const TransactionForm = ({ open, onClose, onSave, initial, parts = [] }) => {
               </div>
               {(attachments.length === 0 ? [emptyAttachment] : attachments).map((att, idx) => (
                 <div key={idx} className={styles.itemListRow}>
-                  <input className={styles.input} placeholder="Name" value={att.name} onChange={e => handleAttachmentChange(idx, 'name', e.target.value)} />
-                  <input className={styles.input} placeholder="Type" value={att.type} onChange={e => handleAttachmentChange(idx, 'type', e.target.value)} />
-                  <input className={styles.input} type="number" min={0} placeholder="ID" value={att.id} onChange={e => handleAttachmentChange(idx, 'id', Number(e.target.value))} />
+                  <input
+                    className={styles.input}
+                    type="text"
+                    value={att.name}
+                    onChange={e => handleAttachmentChange(idx, 'name', e.target.value)}
+                  />
+                  <input
+                    className={styles.input}
+                    type="text"
+                    value={att.type}
+                    onChange={e => handleAttachmentChange(idx, 'type', e.target.value)}
+                  />
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min={0}
+                    value={att.id}
+                    onChange={e => handleAttachmentChange(idx, 'id', Number(e.target.value))}
+                  />
                   <div style={{ display: 'flex', gap: 4 }}>
                     {attachments.length > 0 && (
                       <button className={styles.iconBtn} type="button" onClick={() => handleRemoveAttachment(idx)} title="Remove attachment">&minus;</button>

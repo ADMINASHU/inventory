@@ -387,6 +387,52 @@
   margin-bottom: 2px;
 }
 
+.floatingInputWrapper {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.floatingInput {
+  width: 100%;
+  padding: 14px 10px 8px 10px;
+  border: 1px solid #cfd8dc;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #fff;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.floatingInput:focus {
+  border-color: #1976d2;
+}
+
+.floatingLabel {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 1rem;
+  pointer-events: none;
+  background: transparent;
+  padding: 0 4px;
+  transition: 
+    top 0.18s cubic-bezier(.4,0,.2,1),
+    font-size 0.18s cubic-bezier(.4,0,.2,1),
+    color 0.18s cubic-bezier(.4,0,.2,1);
+}
+
+.floatingInput:focus + .floatingLabel,
+.floatingLabelActive {
+  top: -4px;
+  font-size: 0.85rem;
+  color: #1976d2;
+  background: #fff;
+  z-index: 1;
+  padding: 0 4px;
+}
+
 @media (max-width: 600px) {
   .header, .pagination {
     flex-direction: column;
