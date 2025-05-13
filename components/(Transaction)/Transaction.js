@@ -10,6 +10,7 @@ const PAGE_SIZE = 20;
 
 const Transaction = () => {
   const [data, setData] = useState([]);
+  const [parts, setParts] = useState([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
@@ -23,6 +24,14 @@ const Transaction = () => {
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  useEffect(() => {
+    const fetchParts = async () => {
+      const res = await fetch('/api/list');
+      if (res.ok) setParts(await res.json());
+    };
+    fetchParts();
+  }, []);
 
   const filtered = useMemo(() =>
     data.filter(item =>
@@ -112,6 +121,7 @@ const Transaction = () => {
         onClose={() => { setModalOpen(false); setEditItem(null); }}
         onSave={handleSave}
         initial={editItem}
+        parts={parts}
       />
     </div>
   );

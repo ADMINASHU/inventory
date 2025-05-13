@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styles from './Transaction.module.css';
 
 const emptyItem = { partId: '', count: 0, partName: '', category: '' };
 const emptyAttachment = { name: '', type: '', id: 0 };
 
-const TransactionForm = ({ open, onClose, onSave, initial }) => {
+const TransactionForm = ({ open, onClose, onSave, initial, parts = [] }) => {
   const [transactionId, setTransactionId] = useState('');
   const [date, setDate] = useState('');
   const [items, setItems] = useState([{ ...emptyItem }]);
@@ -22,6 +22,22 @@ const TransactionForm = ({ open, onClose, onSave, initial }) => {
   const [approvedBy, setApprovedBy] = useState('');
   const [approvedAt, setApprovedAt] = useState('');
   const [updateHistory, setUpdateHistory] = useState([]);
+
+  // Dynamically get categories for each item row (in case parts list changes)
+  const getCategories = useMemo(
+    () => Array.from(new Set(parts.map(p => p.category).filter(Boolean))),
+    [parts]
+  );
+
+  // Helper to get part names for a category
+  const getPartNamesByCategory = (category) =>
+    parts.filter(p => p.category === category).map(p => p.partName);
+
+  // Helper to get partId by category and partName
+  const getPartId = (category, partName) => {
+    const found = parts.find(p => p.category === category && p.partName === partName);
+    return found ? found._id : '';
+  };
 
   useEffect(() => {
     if (open && initial) {
@@ -67,7 +83,25 @@ const TransactionForm = ({ open, onClose, onSave, initial }) => {
   }, [items]);
 
   const handleItemChange = (idx, field, value) => {
-    setItems(items => items.map((item, i) => i === idx ? { ...item, [field]: value } : item));
+    setItems(items => {
+      return items.map((item, i) => {
+        if (i !== idx) return item;
+        let newItem = { ...item, [field]: value };
+        // Always recalculate partId if category or partName changes
+        if (field === 'category') {
+          newItem.partName = '';
+          newItem.partId = '';
+        }
+        if (field === 'category' || field === 'partName') {
+          const partId = getPartId(
+            field === 'category' ? value : newItem.category,
+            field === 'partName' ? value : newItem.partName
+          );
+          newItem.partId = partId || '';
+        }
+        return newItem;
+      });
+    });
   };
 
   const handleAddItem = () => setItems(items => [...items, { ...emptyItem }]);
@@ -133,18 +167,58 @@ const TransactionForm = ({ open, onClose, onSave, initial }) => {
             </div>
             <div className={styles.itemListView}>
               <div className={styles.itemListHeader}>
-                <span>Part ID</span>
-                <span>Part Name</span>
                 <span>Category</span>
+                <span>Part Name</span>
+                <span>Part ID</span>
                 <span>Count</span>
                 <span style={{ minWidth: 60 }}></span>
               </div>
               {items.map((item, idx) => (
                 <div key={idx} className={styles.itemListRow}>
-                  <input className={styles.input} type="text" placeholder="Part ID" value={item.partId} onChange={e => handleItemChange(idx, 'partId', e.target.value)} required />
-                  <input className={styles.input} type="text" placeholder="Part Name" value={item.partName || ''} onChange={e => handleItemChange(idx, 'partName', e.target.value)} />
-                  <input className={styles.input} type="text" placeholder="Category" value={item.category || ''} onChange={e => handleItemChange(idx, 'category', e.target.value)} />
-                  <input className={styles.input} type="number" min={0} placeholder="Count" value={item.count} onChange={e => handleItemChange(idx, 'count', Number(e.target.value))} required />
+                  {/* Dynamic Category dropdown */}
+                  <select
+                    className={styles.input}
+                    value={item.category || ''}
+                    onChange={e => handleItemChange(idx, 'category', e.target.value)}
+                    required
+                  >
+                    <option value="">Select Category</option>
+                    {getCategories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                  {/* Part Name dropdown */}
+                  <select
+                    className={styles.input}
+                    value={item.partName || ''}
+                    onChange={e => handleItemChange(idx, 'partName', e.target.value)}
+                    required
+                    disabled={!item.category}
+                  >
+                    <option value="">Select Part Name</option>
+                    {item.category &&
+                      getPartNamesByCategory(item.category).map(name => (
+                        <option key={name} value={name}>{name}</option>
+                      ))}
+                  </select>
+                  {/* Part ID (auto-filled, read-only) */}
+                  <input
+                    className={styles.input}
+                    type="text"
+                    placeholder="Part ID"
+                    value={item.partId || ''}
+                    readOnly
+                  />
+                  {/* Count */}
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min={0}
+                    placeholder="Count"
+                    value={item.count ?? 0}
+                    onChange={e => handleItemChange(idx, 'count', Number(e.target.value))}
+                    required
+                  />
                   <div style={{ display: 'flex', gap: 4 }}>
                     {items.length > 1 && (
                       <button className={styles.iconBtn} type="button" onClick={() => handleRemoveItem(idx)} title="Remove item">&minus;</button>
