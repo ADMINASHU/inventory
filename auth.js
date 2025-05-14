@@ -31,19 +31,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
       credentials: {
-        userID: {},
+        email: {},
         password: {},
       },
-      authorize: async (credentials) => {
+     authorize: async (credentials) => {
         const { email, password } = credentials;
-        const user = await prisma.users.findUnique({ where: { email } });
-        if (!user || !user.password) {
-          throw new Error("User not found");
+        if (email && password) {
+          const user = await prisma.users.findUnique({ where: { email } });
+          if (user && user.password) {
+            const isValidPassword = await bcrypt.compare(
+              password,
+              user.password
+            );
+            if (isValidPassword) {
+              return user;
+            }
+          }
         }
-        const isValidPassword = await bcrypt.compare(password, user.password);
-        if (!isValidPassword) return null;
-
-        return user;
+        return null;
       },
     }),
     Google({
@@ -112,6 +117,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     jwt({ token, user }) {
       if (user) {
+      
         token.isAdmin = user.isAdmin ?? false;
         token.level = user.level ?? 4;
         token.verified = user.verified ?? true;
@@ -124,19 +130,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return token;
     },
-    session({ session, token }) {
-      session.user = {
-        ...session.user,
-        isAdmin: token.isAdmin,
-        level: token.level,
-        verified: token.verified,
-        fName: token.fName,
-        eName: token.eName,
-        email: token.email,
-        image: token.image,
-        provider: token.provider,
-        providerAccountId: token.providerAccountId,
-      };
+     session({ session, token }) {
+      session.user = token;
       return session;
     },
   },

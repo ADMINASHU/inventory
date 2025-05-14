@@ -1,22 +1,27 @@
 import React from 'react';
 import styles from './Transaction.module.css';
 
-const TransactionTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) => {
+const TransactionTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete, loggedUser, users = [] }) => {
+  // Helper to get user's fName by id
+  const getUserName = (id) => {
+    const user = users.find(u => u._id === id);
+    return user ? user.fName : id;
+  };
+
   return (
     <div className={styles.tableWrapper}>
       <table className={styles.table}>
         <thead>
           <tr>
-            <th className={styles.th}>#</th>
-            <th className={styles.th}>Transaction ID</th>
+            <th className={styles.th}>S No.</th>
             <th className={styles.th}>Date</th>
-            <th className={styles.th}>Items</th>
-            <th className={styles.th}>Total</th>
-            <th className={styles.th}>Method</th>
+            <th className={styles.th}>Transaction ID</th>
             <th className={styles.th}>Type</th>
-            <th className={styles.th}>From</th>
-            <th className={styles.th}>To</th>
+            <th className={styles.th}>Account</th>
+            <th className={styles.th}>Method</th>
+            <th className={styles.th}>Total</th>
             <th className={styles.th}>Status</th>
+            <th className={styles.th}>Items</th>
             <th className={styles.th}>Actions</th>
           </tr>
         </thead>
@@ -34,9 +39,15 @@ const TransactionTable = ({ paginated, selectedId, setSelectedId, onEdit, onDele
                 style={{ cursor: 'pointer' }}
               >
                 <td className={styles.td}>{idx + 1}</td>
-                <td className={styles.td}>{txn.transactionId}</td>
                 <td className={styles.td}>{txn.date ? new Date(txn.date).toLocaleDateString() : ''}</td>
-                <td className={styles.td}>
+                <td className={styles.td}>{txn.transactionId}</td>
+                <td className={styles.td}>{txn.from === loggedUser?.sub ? "SEND" : "RECEIVE"}</td>
+                <td className={styles.td}>{getUserName(txn.to)}</td>
+                <td className={styles.td}>{txn.transactionMethod}</td>
+                <td className={styles.td}>{txn.total}</td>
+                <td className={styles.td}>{txn.transactionStatus}</td>
+              
+                  <td className={styles.td}>
                   <ul className={styles.itemList}>
                     {txn.items && txn.items.map((item, i) => (
                       <li key={i}>
@@ -48,12 +59,6 @@ const TransactionTable = ({ paginated, selectedId, setSelectedId, onEdit, onDele
                     ))}
                   </ul>
                 </td>
-                <td className={styles.td}>{txn.total}</td>
-                <td className={styles.td}>{txn.transactionMethod}</td>
-                <td className={styles.td}>{txn.transactionType}</td>
-                <td className={styles.td}>{txn.from}</td>
-                <td className={styles.td}>{txn.to}</td>
-                <td className={styles.td}>{txn.transactionStatus}</td>
                 <td className={styles.td}>
                   <button
                     className={styles.iconBtn}

@@ -8,7 +8,7 @@ import styles from './Transaction.module.css';
 
 const PAGE_SIZE = 20;
 
-const Transaction = () => {
+const Transaction = ({ loggedUser }) => {
   const [data, setData] = useState([]);
   const [parts, setParts] = useState([]);
   const [users, setUsers] = useState([]);
@@ -115,6 +115,8 @@ const Transaction = () => {
         setSelectedId={setSelectedId}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        loggedUser={loggedUser}
+        users={users}
       />
       <PaginationCard
         paginated={paginated}
@@ -133,6 +135,7 @@ const Transaction = () => {
         initial={editItem}
         parts={parts}
         users={users}
+        loggedUser={loggedUser}
       />
     </div>
   );
