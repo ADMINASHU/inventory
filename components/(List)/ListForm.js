@@ -5,14 +5,14 @@ const ListForm = ({ open, onClose, onSave, initial }) => {
   const [partName, setPartName] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
-  const [count, setCount] = useState(0);
+
 
   useEffect(() => {
     if (open) {
       setPartName(initial?.partName || '');
       setCategory(initial?.category || '');
       setDescription(initial?.description || '');
-      setCount(initial?.counts?.[0]?.count || 0);
+
     }
   }, [open, initial]);
 
@@ -32,7 +32,7 @@ const ListForm = ({ open, onClose, onSave, initial }) => {
             <option value="Active">Active</option>
           </select>
           <input className={styles.input} placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />
-          <input className={styles.input} type="number" min={0} placeholder="Count" value={count} onChange={e => setCount(Number(e.target.value))} />
+
         </div>
         <div style={{ marginTop: 18, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
           <button className={styles.pageBtn} onClick={onClose}>Cancel</button>
@@ -41,7 +41,7 @@ const ListForm = ({ open, onClose, onSave, initial }) => {
               partName,
               category,
               description,
-              counts: [{ account: 'Main', count: Number(count) }]
+              counts: []
             });
           }}>{initial ? 'Update' : 'Add'}</button>
         </div>

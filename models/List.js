@@ -7,8 +7,8 @@ const ListSchema = new mongoose.Schema(
     description: { type: String },
     counts: [
       {
-        account: { type: String, required: true },
-        count: { type: Number, required: true },
+        _id: { type: mongoose.Schema.Types.ObjectId, auto: false },
+        count: { type: Number, required: false },
       },
     ],
   },
