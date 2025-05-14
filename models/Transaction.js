@@ -6,19 +6,19 @@ const TransactionSchema = new mongoose.Schema(
     date: { type: Date, required: true },
     items: [
       {
-        _id : { type: mongoose.Schema.Types.ObjectId, auto: false },
+        _id: { type: mongoose.Schema.Types.ObjectId, auto: false },
         count: { type: Number, required: true },
       },
     ],
     total: { type: Number, required: true },
     transactionMethod: { type: String, required: true },
-    transactionType: { type: String, required: true },
-    from: { type: String, required: true },
-    to: { type: String, required: true },
+    transactionType: { type: String, required: true, enum: ["SEND", "RECEIVED"] },
+    from: { type: mongoose.Schema.Types.ObjectId, auto: false, required: true },
+    to: { type: mongoose.Schema.Types.ObjectId, auto: false, required: true },
     createdBy: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
     updateHistory: [
-      { 
+      {
         updateType: { type: String, required: true },
         updatedBy: { type: String, required: true },
         updatedAt: { type: Date, default: Date.now },
@@ -26,9 +26,9 @@ const TransactionSchema = new mongoose.Schema(
     ],
     isDeleted: { type: Boolean, default: false },
     isApproved: { type: Boolean, default: false },
-    approvedBy: { type: String, default: null },  
+    approvedBy: { type: String, default: null },
     approvedAt: { type: Date, default: null },
-  
+
     note: { type: String, default: null },
     attachment: [
       {
@@ -37,9 +37,14 @@ const TransactionSchema = new mongoose.Schema(
         id: { type: Number, required: true },
       },
     ],
-    transactionStatus: { type: String, required: true },
+    transactionStatus: {
+      type: String,
+      required: true,
+      enum: ["IN PROCESS", "SUCCESSFUL", "CANCELLED"],
+    },
   },
   { timestamps: true }
 );
 
-export const Transaction = mongoose.models.Transaction || mongoose.model("Transaction", TransactionSchema);
+export const Transaction =
+  mongoose.models.Transaction || mongoose.model("Transaction", TransactionSchema);

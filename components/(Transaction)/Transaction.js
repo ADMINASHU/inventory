@@ -11,6 +11,7 @@ const PAGE_SIZE = 20;
 const Transaction = () => {
   const [data, setData] = useState([]);
   const [parts, setParts] = useState([]);
+  const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
@@ -31,6 +32,12 @@ const Transaction = () => {
       if (res.ok) setParts(await res.json());
     };
     fetchParts();
+    const fetchUsers = async () => {
+      const res = await fetch('/api/users');
+      if (res.ok) setUsers(await res.json());
+    };
+    fetchParts();
+    fetchUsers();
   }, []);
 
   const filtered = useMemo(() =>
@@ -125,6 +132,7 @@ const Transaction = () => {
         onSave={handleSave}
         initial={editItem}
         parts={parts}
+        users={users}
       />
     </div>
   );

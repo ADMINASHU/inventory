@@ -42,7 +42,7 @@ function FloatingLabelTextarea({ label, value, onChange, required, ...props }) {
 const emptyItem = { _id: '', count: 0, partName: '', category: '' };
 const emptyAttachment = { name: '', type: '', id: 0 };
 
-const TransactionForm = ({ open, onClose, onSave, initial, parts = [] }) => {
+const TransactionForm = ({ open, onClose, onSave, initial, parts = [], users = [] }) => {
   const [transactionId, setTransactionId] = useState('');
   const [date, setDate] = useState('');
   const [items, setItems] = useState([{ ...emptyItem }]);
@@ -76,6 +76,19 @@ const TransactionForm = ({ open, onClose, onSave, initial, parts = [] }) => {
     const found = parts.find(p => p.category === category && p.partName === partName);
     return found ? found._id : '';
   };
+
+  // Helper to get available "To" users (exclude selected "From")
+  const availableToUsers = useMemo(
+    () => users.filter(u => u._id !== from),
+    [users, from]
+  );
+
+  // Prevent selecting same user in both fields
+  useEffect(() => {
+    if (from && from === to) {
+      setTo('');
+    }
+  }, [from, to]);
 
   useEffect(() => {
     if (open && initial) {
@@ -207,8 +220,37 @@ const TransactionForm = ({ open, onClose, onSave, initial, parts = [] }) => {
               <FloatingLabelInput label="Date" type="date" value={date} onChange={e => setDate(e.target.value)} required />
               <FloatingLabelInput label="Transaction Method" value={transactionMethod} onChange={e => setTransactionMethod(e.target.value)} required />
               <FloatingLabelInput label="Transaction Type" value={transactionType} onChange={e => setTransactionType(e.target.value)} required />
-              <FloatingLabelInput label="From" value={from} onChange={e => setFrom(e.target.value)} required />
-              <FloatingLabelInput label="To" value={to} onChange={e => setTo(e.target.value)} required />
+              {/* From dropdown */}
+              <div className={styles.floatingInputWrapper}>
+                <select
+                  className={styles.floatingInput}
+                  value={from}
+                  onChange={e => setFrom(e.target.value)}
+                  required
+                >
+                  <option value="">Select From User</option>
+                  {users.map(u => (
+                    <option key={u._id} value={u._id}>{u.fName}</option>
+                  ))}
+                </select>
+                <label className={`${styles.floatingLabel} ${from ? styles.floatingLabelActive : ''}`}>From</label>
+              </div>
+              {/* To dropdown */}
+              <div className={styles.floatingInputWrapper}>
+                <select
+                  className={styles.floatingInput}
+                  value={to}
+                  onChange={e => setTo(e.target.value)}
+                  required
+                  disabled={!from}
+                >
+                  <option value="">Select To User</option>
+                  {availableToUsers.map(u => (
+                    <option key={u._id} value={u._id}>{u.fName}</option>
+                  ))}
+                </select>
+                <label className={`${styles.floatingLabel} ${to ? styles.floatingLabelActive : ''}`}>To</label>
+              </div>
               <FloatingLabelInput label="Created By" value={createdBy} onChange={e => setCreatedBy(e.target.value)} required />
               <FloatingLabelInput label="Transaction Status" value={transactionStatus} onChange={e => setTransactionStatus(e.target.value)} required />
             </div>
