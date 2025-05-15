@@ -15,10 +15,10 @@ import {
 } from "./lib/routes";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  // adapter: PrismaAdapter(prisma),
   pages: {
     signIn: "/login", // Ensure this page exists and handles Google sign-in properly
-    error: "/error", // Update to a dedicated error page
+    // error: "/error", 
   },
   session: {
     strategy: "jwt",
@@ -59,38 +59,38 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           response_type: "code",
         },
       },
-      profile(profile) {
-        return {
-          id: profile.sub,
-          email: profile.email,
-          name: profile.name,
-          image: profile.picture,
-          isAdmin: false,
-          level: 4,
-          verified: true,
-          fName: profile.given_name || profile.name || "User",
-          eName: "",
-          provider: "google",
-          providerAccountId: profile.sub,
-        };
-      },
+      // profile(profile) {
+      //   return {
+      //     id: profile.sub,
+      //     email: profile.email,
+      //     name: profile.name,
+      //     image: profile.picture,
+      //     isAdmin: false,
+      //     level: 4,
+      //     verified: true,
+      //     fName: profile.given_name || profile.name || "User",
+      //     eName: "",
+      //     provider: "google",
+      //     providerAccountId: profile.sub,
+      //   };
+      // },
     }),
   ],
   callbacks: {
-    async signIn({ account, profile }) {
-      if (account.provider === "google") {
-        return profile.email_verified || false; // Ensure email is verified
-      }
-      return true;
-    },
-    async redirect({ url, baseUrl }) {
-      // Ensure proper redirection to callbackUrl or baseUrl
-      return url.startsWith(baseUrl) ? url : baseUrl;
-    },
+    // async signIn({ account, profile }) {
+    //   if (account.provider === "google") {
+    //     return profile.email_verified || false; // Ensure email is verified
+    //   }
+    //   return true;
+    // },
+    // async redirect({ url, baseUrl }) {
+    //   // Ensure proper redirection to callbackUrl or baseUrl
+    //   return url.startsWith(baseUrl) ? url : baseUrl;
+    // },
     authorized({ auth, request: { nextUrl } }) {
       const isAuthenticated = !!auth?.user;
       const isVerified = auth?.user?.verified;
-      const level = auth?.user?.level;
+   console.log(JSON.stringify(auth?.user))
 
       const isPublicRoute =
         PUBLIC_ROUTES.find((route) => nextUrl.pathname.startsWith(route)) &&
@@ -104,9 +104,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return NextResponse.redirect(new URL(LOGIN, nextUrl));
       }
 
-      if (isVerifiedRoute && !isVerified) {
-        return NextResponse.redirect(new URL(UNAUTHORIZED, nextUrl));
-      }
+      // if (isVerifiedRoute && !isVerified) {
+      //   return NextResponse.redirect(new URL(UNAUTHORIZED, nextUrl));
+      // }
       return NextResponse.next();
     },
     jwt({ token, user }) {
