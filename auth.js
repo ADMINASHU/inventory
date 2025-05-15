@@ -12,15 +12,13 @@ import {
   PROTECTED_ROUTES,
   VERIFIED_ROUTES,
   UNAUTHORIZED,
-  AUTH_ROUTES,
-  AUTH_API_ROUTES,
 } from "./lib/routes";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   pages: {
-    signIn: "/login",
-    error: "/login",
+    signIn: "/login", // Ensure this page exists and handles Google sign-in properly
+    error: "/error", // Update to a dedicated error page
   },
   session: {
     strategy: "jwt",
@@ -34,7 +32,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: {},
         password: {},
       },
-     authorize: async (credentials) => {
+      authorize: async (credentials) => {
         const { email, password } = credentials;
         if (email && password) {
           const user = await prisma.users.findUnique({ where: { email } });
@@ -79,14 +77,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-      
     async signIn({ account, profile }) {
       if (account.provider === "google") {
-        return profile.email_verified;
+        return profile.email_verified || false; // Ensure email is verified
       }
       return true;
     },
-  
+    async redirect({ url, baseUrl }) {
+      // Ensure proper redirection to callbackUrl or baseUrl
+      return url.startsWith(baseUrl) ? url : baseUrl;
+    },
     authorized({ auth, request: { nextUrl } }) {
       const isAuthenticated = !!auth?.user;
       const isVerified = auth?.user?.verified;
@@ -96,14 +96,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         PUBLIC_ROUTES.find((route) => nextUrl.pathname.startsWith(route)) &&
         !PROTECTED_ROUTES.find((route) => nextUrl.pathname.includes(route));
 
-      const isAuthRoute = AUTH_ROUTES.find((route) => nextUrl.pathname.startsWith(route));
-      const isAuthApiRoute = AUTH_API_ROUTES.find((route) => nextUrl.pathname.startsWith(route));
- 
       const isVerifiedRoute = VERIFIED_ROUTES.find((route) => nextUrl.pathname.startsWith(route));
 
-      if (isAuthApiRoute) {
-        return null;
-      }
+    
 
       if (!isAuthenticated && !isPublicRoute) {
         return NextResponse.redirect(new URL(LOGIN, nextUrl));
@@ -112,12 +107,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (isVerifiedRoute && !isVerified) {
         return NextResponse.redirect(new URL(UNAUTHORIZED, nextUrl));
       }
-  
       return NextResponse.next();
     },
     jwt({ token, user }) {
       if (user) {
-      
         token.isAdmin = user.isAdmin ?? false;
         token.level = user.level ?? 4;
         token.verified = user.verified ?? true;
@@ -130,7 +123,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return token;
     },
-     session({ session, token }) {
+    session({ session, token }) {
       session.user = token;
       return session;
     },
