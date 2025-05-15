@@ -59,21 +59,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           response_type: "code",
         },
       },
-      // profile(profile) {
-      //   return {
-      //     id: profile.sub,
-      //     email: profile.email,
-      //     name: profile.name,
-      //     image: profile.picture,
-      //     isAdmin: false,
-      //     level: 4,
-      //     verified: true,
-      //     fName: profile.given_name || profile.name || "User",
-      //     eName: "",
-      //     provider: "google",
-      //     providerAccountId: profile.sub,
-      //   };
-      // },
+      profile(profile) {
+        return {
+          id: profile.sub,
+          email: profile.email,
+          name: profile.name,
+          image: profile.picture,
+          isAdmin: false,
+          level: 4,
+          verified: true,
+          fName: profile.given_name || profile.name || "User",
+          eName: "",
+          provider: "google",
+          providerAccountId: profile.sub,
+        };
+      },
     }),
   ],
   callbacks: {
@@ -104,9 +104,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return NextResponse.redirect(new URL(LOGIN, nextUrl));
       }
 
-      // if (isVerifiedRoute && !isVerified) {
-      //   return NextResponse.redirect(new URL(UNAUTHORIZED, nextUrl));
-      // }
+      if (isVerifiedRoute && !isVerified) {
+        return NextResponse.redirect(new URL(UNAUTHORIZED, nextUrl));
+      }
       return NextResponse.next();
     },
     jwt({ token, user }) {
