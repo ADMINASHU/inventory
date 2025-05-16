@@ -18,7 +18,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   // adapter: PrismaAdapter(prisma),
   pages: {
     signIn: "/login", // Ensure this page exists and handles Google sign-in properly
-    // error: "/error", 
+    error: "/login", // Error code passed in query string as ?error=
   },
   session: {
     strategy: "jwt",
@@ -66,7 +66,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           name: profile.name,
           image: profile.picture,
           isAdmin: false,
-          level: 4,
           verified: true,
           fName: profile.given_name || profile.name || "User",
           eName: "",
@@ -90,7 +89,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     authorized({ auth, request: { nextUrl } }) {
       const isAuthenticated = !!auth?.user;
       const isVerified = auth?.user?.verified;
-   console.log(JSON.stringify(auth?.user))
+
 
       const isPublicRoute =
         PUBLIC_ROUTES.find((route) => nextUrl.pathname.startsWith(route)) &&
@@ -112,8 +111,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     jwt({ token, user }) {
       if (user) {
         token.isAdmin = user.isAdmin ?? false;
-        token.level = user.level ?? 4;
-        token.verified = user.verified ?? true;
+        token.verified = user.verified ?? false;
         token.fName = user.fName ?? user.name ?? "User";
         token.eName = user.eName ?? "";
         token.email = user.email;

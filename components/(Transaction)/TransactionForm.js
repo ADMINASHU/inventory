@@ -69,7 +69,7 @@ const TransactionForm = ({
   const [approvedAt, setApprovedAt] = useState("");
   const [updateHistory, setUpdateHistory] = useState([]);
 
-  console.log(loggedUser?.sub);
+
 
   // Dynamically get categories for each item row (in case parts list changes)
   const getCategories = useMemo(
