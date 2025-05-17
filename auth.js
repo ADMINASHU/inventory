@@ -15,7 +15,7 @@ import {
 } from "./lib/routes";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  // adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma),
   pages: {
     signIn: "/login", // Ensure this page exists and handles Google sign-in properly
     error: "/login", // Error code passed in query string as ?error=
