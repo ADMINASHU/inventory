@@ -1,49 +1,54 @@
-"use client"
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import UsersHeader from './UsersHeader';
-import UsersTable from './UsersTable';
-import PaginationCard from '../(List)/PaginationCard';
-import UserForm from './UserForm';
-import styles from './Users.module.css';
+"use client";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import UsersHeader from "./UsersHeader";
+import UsersTable from "./UsersTable";
+import PaginationCard from "../(List)/PaginationCard";
+import UserForm from "./UserForm";
+import styles from "./Users.module.css";
 
 const PAGE_SIZE = 20;
 
 const Users = () => {
   const [data, setData] = useState([]);
-  const [search, setSearch] = useState('');
-  const [role, setRole] = useState('');
+  const [search, setSearch] = useState("");
+  const [type, setType] = useState("STORE");
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
   const fetchData = useCallback(async () => {
-    const res = await fetch('/api/users');
+    const res = await fetch("/api/users");
     if (res.ok) {
       const json = await res.json();
       // Ensure data is always an array
-      setData(Array.isArray(json) ? json : (json?.users || []));
+      setData(Array.isArray(json) ? json : json?.users || []);
     }
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-  const filtered = useMemo(() =>
-    Array.isArray(data)
-      ? data.filter(user =>
-          (!role || user.role === role) &&
-          (!search ||
-            (`${user.fName || ""} ${user.eName || ""}`.toLowerCase().includes(search.toLowerCase()) ||
-            user.email?.toLowerCase().includes(search.toLowerCase()))
+  const filtered = useMemo(
+    () =>
+      Array.isArray(data)
+        ? data.filter(
+            (user) =>
+              (!type || user.type === type) &&
+              (!search ||
+                `${user.fName || ""} ${user.eName || ""}`
+                  .toLowerCase()
+                  .includes(search.toLowerCase()) ||
+                user.email?.toLowerCase().includes(search.toLowerCase()))
           )
-        )
-      : [],
-    [data, role, search]
+        : [],
+    [data, type, search]
   );
   const total = filtered.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const paginated = useMemo(() =>
-    filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
     [filtered, page]
   );
 
@@ -54,18 +59,22 @@ const Users = () => {
   const pageNumbers = [];
   for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
 
-  const handleAdd = () => { setEditUser(null); setModalOpen(true); };
+  const handleAdd = () => {
+    setEditUser(null);
+    setModalOpen(true);
+  };
   const handleEdit = () => {
-    const user = data.find(u => (u._id || data.indexOf(u)) === selectedId);
-    setEditUser(user); setModalOpen(true);
+    const user = data.find((u) => (u._id || data.indexOf(u)) === selectedId);
+    setEditUser(user);
+    setModalOpen(true);
   };
   const handleDelete = async () => {
-    const user = data.find(u => (u._id || data.indexOf(u)) === selectedId);
+    const user = data.find((u) => (u._id || data.indexOf(u)) === selectedId);
     if (!user) return;
-    if (!window.confirm('Delete this user?')) return;
-    await fetch('/api/users', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+    if (!window.confirm("Delete this user?")) return;
+    await fetch("/api/users", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ _id: user._id }),
     });
     setSelectedId(null);
@@ -73,15 +82,15 @@ const Users = () => {
   };
   const handleSave = async (user) => {
     if (editUser && editUser._id) {
-      await fetch('/api/users', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...user, _id: editUser._id }),
       });
     } else {
-      await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(user),
       });
     }
@@ -94,8 +103,8 @@ const Users = () => {
   return (
     <div className={styles.container}>
       <UsersHeader
-        role={role}
-        setRole={setRole}
+        type={type}
+        setType={setType}
         search={search}
         setSearch={setSearch}
         onAdd={handleAdd}
@@ -119,12 +128,15 @@ const Users = () => {
       />
       <UserForm
         open={modalOpen}
-        onClose={() => { setModalOpen(false); setEditUser(null); }}
+        onClose={() => {
+          setModalOpen(false);
+          setEditUser(null);
+        }}
         onSave={handleSave}
         initial={editUser}
       />
     </div>
   );
-}
+};
 
 export default Users;

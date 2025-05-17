@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import styles from "./Transaction.module.css";
 
+// Transaction type options (from model)
+const TRANSACTION_TYPE_OPTIONS = [
+  { value: "SEND", label: "SEND" },
+  { value: "RECEIVED", label: "RECEIVED" },
+];
+
 // Floating label input component
 function FloatingLabelInput({ label, value, onChange, type = "text", required, ...props }) {
   return (
@@ -89,6 +95,7 @@ const TransactionForm = ({
 
   // Helper to get available "To" users (exclude selected "From")
   const availableToUsers = useMemo(() => users.filter((u) => u._id !== from), [users, from]);
+  const availableFromUsers = useMemo(() => users.filter((u) => u._id !== to && u.type === "STORE"), [users, to]);
 
   // Prevent selecting same user in both fields
   useEffect(() => {
@@ -243,14 +250,50 @@ const TransactionForm = ({
                 onChange={(e) => setTransactionMethod(e.target.value)}
                 required
               />
-              <FloatingLabelInput
-                label="Transaction Type"
-                value={transactionType}
-                onChange={(e) => setTransactionType(e.target.value)}
-                required
-              />
-              {/* To dropdown */}
+              {/* Transaction Type dropdown */}
               <div className={styles.floatingInputWrapper}>
+                <select
+                  className={styles.floatingInput}
+                  value={transactionType}
+                  onChange={(e) => setTransactionType(e.target.value)}
+                  required
+                >
+                  <option value="">Select Transaction Type</option>
+                  {TRANSACTION_TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <label
+                  className={`${styles.floatingLabel} ${transactionType ? styles.floatingLabelActive : ""}`}
+                >
+                  Transaction Type
+                </label>
+              </div>
+              {/* To dropdown */}
+             { transactionType === "RECEIVED" && <div className={styles.floatingInputWrapper}>
+                <select
+                  className={styles.floatingInput}
+                  value={from}
+                  onChange={(e) => setFrom(e.target.value)}
+                  required
+                  disabled={!from}
+                >
+                  <option value="">Select From User</option>
+                  {availableFromUsers.map((u) => (
+                    <option key={u._id} value={u._id}>
+                      {u.fName}
+                    </option>
+                  ))}
+                </select>
+                <label
+                  className={`${styles.floatingLabel} ${from ? styles.floatingLabelActive : ""}`}
+                >
+                  From
+                </label>
+              </div>}
+             { transactionType === "SEND" && <div className={styles.floatingInputWrapper}>
                 <select
                   className={styles.floatingInput}
                   value={to}
@@ -270,7 +313,7 @@ const TransactionForm = ({
                 >
                   To
                 </label>
-              </div>
+              </div>}
               <FloatingLabelInput
                 label="Transaction Status"
                 value={transactionStatus}

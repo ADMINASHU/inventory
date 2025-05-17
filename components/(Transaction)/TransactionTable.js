@@ -42,7 +42,7 @@ const TransactionTable = ({ paginated, selectedId, setSelectedId, onEdit, onDele
                 <td className={styles.td}>{txn.date ? new Date(txn.date).toLocaleDateString() : ''}</td>
                 <td className={styles.td}>{txn.transactionId}</td>
                 <td className={styles.td}>{txn.from === loggedUser?.sub ? "SEND" : "RECEIVE"}</td>
-                <td className={styles.td}>{getUserName(txn.to)}</td>
+                <td className={styles.td}>{getUserName(txn.from === loggedUser?.sub ? txn.to : txn.from)}</td>
                 <td className={styles.td}>{txn.transactionMethod}</td>
                 <td className={styles.td}>{txn.total}</td>
                 <td className={styles.td}>{txn.transactionStatus}</td>

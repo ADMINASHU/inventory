@@ -80,13 +80,12 @@ export const signUp = async ({ data }) => {
   
 };
 
-export async function doGoogleSignIn(params) {
-  // try {
+export async function doGoogleSignIn() {
+  try {
     await signIn("google", {
-      // ...params,
-      redirectTo: "/test",
+      redirectTo: "/",
     });
-  // } catch (error) {
-  //   return { error: error.message };
-  // }
+  } catch (error) {
+    return { error: error.message };
+  }
 }

@@ -14,7 +14,6 @@ const UsersTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) 
             <th>Designation</th>
             <th>Branch</th>
             <th>Region</th>
-            <th>Level</th>
             <th>Verified</th>
             <th></th>
           </tr>
@@ -45,7 +44,7 @@ const UsersTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) 
                 <td>{user.designation}</td>
                 <td>{user.branch}</td>
                 <td>{user.region}</td>
-                <td>{user.level ? `Level ${user.level}` : ''}</td>
+          
                 <td style={{
                   color: user.verified ? "green" : "red",
                   textAlign: "center"

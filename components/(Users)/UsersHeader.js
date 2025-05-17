@@ -1,18 +1,18 @@
 import React from 'react';
 import styles from './Users.module.css';
 
-const UsersHeader = ({ role, setRole, search, setSearch, onAdd }) => (
+const UsersHeader = ({ type, setType, search, setSearch, onAdd }) => (
   <div className={styles.card}>
     <div className={styles.header}>
       <div className={styles.filters}>
         <select
-          value={role}
-          onChange={e => setRole(e.target.value)}
+          value={type}
+          onChange={e => setType(e.target.value)}
           className={styles.select}
         >
-          <option value="">All Roles</option>
-          <option value="admin">Admin</option>
-          <option value="user">User</option>
+          <option value="">All Type</option>
+          <option value="USER">User</option>
+          <option value="STORE">Store</option>
           {/* Add more roles as needed */}
         </select>
         <input

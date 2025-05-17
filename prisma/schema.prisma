@@ -12,7 +12,7 @@ model users {
   email     String @unique
   password  String? // <-- make optional for OAuth
   isAdmin   Boolean @default(false)
-  level     Int     @default(4)
+  type      String     @default("USER")
   verified  Boolean @default(false)
   fName     String  @default("User")
   eName     String?

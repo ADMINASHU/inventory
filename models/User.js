@@ -16,7 +16,7 @@ const UserSchema = new mongoose.Schema({
     required: true,
     default: false,
   },
-  level: { type: Number, required: true, default: 4 },
+
   verified: { type: Boolean, required: true, default: false },
   fName: { type: String, required: true, default: "User" },
   eName: { type: String },
@@ -24,6 +24,7 @@ const UserSchema = new mongoose.Schema({
   designation: { type: String },
   region: { type: String },
   branch: { type: String },
+  type: { type: String , required: true, default: "USER", enum: ["USER", "STORE"] },
   mobileNo: { type: String },
   resetToken: { type: String },
   resetTokenExpiry: { type: Date },

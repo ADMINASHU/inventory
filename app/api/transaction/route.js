@@ -15,9 +15,17 @@ export async function GET(request) {
   await connectToServiceEaseDB();
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
+  const userId = searchParams.get('userId');
   if (id) {
     const item = await Transaction.findById(id);
     return NextResponse.json(item);
+  }
+  if (userId) {
+    // Fetch transactions where from == userId or to == userId
+    const transactions = await Transaction.find({
+      $or: [{ from: userId }, { to: userId }]
+    });
+    return NextResponse.json(transactions);
   }
   const transactions = await Transaction.find({});
   return NextResponse.json(transactions);

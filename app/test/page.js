@@ -13,12 +13,11 @@ const TestPage = async () => {
       <div>TestPage no login required</div>
       <div>{JSON.stringify(session?.user)}</div>
       <div>{session?.user.name}</div>
-      <Image
-       required 
+     <Image
+       required
         height={24}
         width={24}
-        // src={`/${session?.user.image}`}
-        src={session?.user.image}
+        src= {session.user.provider === "google" ? session?.user.image : `/${session?.user.image}`} 
         alt="User"
       />
     </div>

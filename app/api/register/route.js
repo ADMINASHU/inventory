@@ -35,6 +35,8 @@ export async function POST(request) {
       email,
       password: hashedPassword,
       isAdmin,
+      type: "USER",
+      verified: false,
     
     });
 

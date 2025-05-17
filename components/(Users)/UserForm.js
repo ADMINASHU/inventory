@@ -9,7 +9,7 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
   const [designation, setDesignation] = useState('');
   const [branch, setBranch] = useState('');
   const [region, setRegion] = useState('');
-  const [level, setLevel] = useState('');
+  const [type, setType] = useState('STORE');
   const [verified, setVerified] = useState(false);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
       setDesignation(initial?.designation || '');
       setBranch(initial?.branch || '');
       setRegion(initial?.region || '');
-      setLevel(initial?.level || '');
+      setType(initial?.type || 'STORE');
       setVerified(initial?.verified || false);
     }
   }, [open, initial]);
@@ -42,7 +42,7 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
           <input className={styles.input} placeholder="Designation" value={designation} onChange={e => setDesignation(e.target.value)} />
           <input className={styles.input} placeholder="Branch" value={branch} onChange={e => setBranch(e.target.value)} />
           <input className={styles.input} placeholder="Region" value={region} onChange={e => setRegion(e.target.value)} />
-          <input className={styles.input} type="number" placeholder="Level" value={level} onChange={e => setLevel(e.target.value)} />
+          <input className={styles.input} placeholder="Type" value={type} onChange={e => setType(e.target.value)} />
           <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <input type="checkbox" checked={verified} onChange={e => setVerified(e.target.checked)} />
             Verified
@@ -59,7 +59,7 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
               designation,
               branch,
               region,
-              level,
+              type,
               verified
             });
           }}>{initial ? 'Update' : 'Add'}</button>
