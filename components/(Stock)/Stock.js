@@ -60,7 +60,10 @@ function TransactionTable({ loggedUser }) {
     const part = parts.find((part) => String(part._id) === id);
     return part ? part.partName : "Unknown Part";
   }
-
+  const getPartsCategory = (id) => {
+    const part = parts.find((part) => String(part._id) === id);
+    return part ? part.category : "Unknown Category";
+  }
 
   return (
     <div>
@@ -81,7 +84,8 @@ function TransactionTable({ loggedUser }) {
         <thead>
           <tr style={{ background: "#f5f5f5" }}>
             <th style={{ padding: "8px", border: "1px solid #ddd" }}>S. No</th>
-            <th style={{ padding: "8px", border: "1px solid #ddd" }}>Item ID</th>
+            <th style={{ padding: "8px", border: "1px solid #ddd" }}>Item Name</th>
+            <th style={{ padding: "8px", border: "1px solid #ddd" }}>Category</th>
             <th style={{ padding: "8px", border: "1px solid #ddd" }}>Total Count</th>
           </tr>
         </thead>
@@ -99,6 +103,7 @@ function TransactionTable({ loggedUser }) {
                   {(page - 1) * ITEMS_PER_PAGE + idx + 1}
                 </td>
                 <td style={{ padding: "8px", border: "1px solid #ddd" }}>{getPartsName(item._id)}</td>
+                <td style={{ padding: "8px", border: "1px solid #ddd" }}>{getPartsCategory(item._id)}</td>
                 <td style={{ padding: "8px", border: "1px solid #ddd" }}>{item.count}</td>
               </tr>
             ))
