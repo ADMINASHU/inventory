@@ -20,7 +20,7 @@ const Transaction = ({ loggedUser }) => {
   const [selectedId, setSelectedId] = useState(null);
 
   const fetchData = useCallback(async () => {
-    
+    if (!loggedUser?.branch) return;
     if (!loggedUser?.sub) return;
     const res = await fetch(`/api/transaction?userId=${loggedUser.sub}`);
     if (res.ok) setData(await res.json());

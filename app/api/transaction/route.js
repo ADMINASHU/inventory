@@ -11,6 +11,15 @@ async function parseBody(request) {
   }
 }
 
+// Helper to generate transactionId
+function generateTransactionId(branchName, date, series = 1) {
+  if (!branchName || !date) return '';
+  const prefix = branchName.slice(0, 3).toUpperCase();
+  const yymmdd = date.replace(/-/g, '').slice(2, 8); // "YYYY-MM-DD" -> "YYMMDD"
+  const seriesStr = String(series).padStart(4, '0');
+  return `${prefix}${yymmdd}-${seriesStr}`;
+}
+
 export async function GET(request) {
   await connectToServiceEaseDB();
   const { searchParams } = new URL(request.url);
@@ -35,6 +44,36 @@ export async function POST(request) {
   await connectToServiceEaseDB();
   const body = await request.json();
   try {
+    // --- Server-side transactionId generation ---
+    // You may need to adjust this if your branch field is named differently
+    const branchName = body.branch || '';
+    const date = body.date ? body.date.slice(0, 10) : ''; // "YYYY-MM-DD"
+    if (!branchName || !date) {
+      return NextResponse.json({ error: 'branch and date are required' }, { status: 400 });
+    }
+
+    // Find latest transaction for this branch and date
+    const prefix = branchName.slice(0, 3).toUpperCase();
+    const yymmdd = date.replace(/-/g, '').slice(2, 8);
+    const idPrefix = `${prefix}${yymmdd}-`;
+
+    // Find the latest transactionId for this branch/date
+    const latest = await Transaction.findOne(
+      { transactionId: { $regex: `^${idPrefix}\\d{4}$` } },
+      {},
+      { sort: { transactionId: -1 } }
+    );
+
+    let nextSeries = 1;
+    if (latest && latest.transactionId) {
+      const match = latest.transactionId.match(/-(\d{4})$/);
+      if (match) {
+        nextSeries = parseInt(match[1], 10) + 1;
+      }
+    }
+
+    body.transactionId = generateTransactionId(branchName, date, nextSeries);
+
     const transaction = await Transaction.create(body);
     return NextResponse.json(transaction, { status: 201 });
   } catch (err) {

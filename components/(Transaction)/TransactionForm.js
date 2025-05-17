@@ -75,8 +75,6 @@ const TransactionForm = ({
   const [approvedAt, setApprovedAt] = useState("");
   const [updateHistory, setUpdateHistory] = useState([]);
 
-
-
   // Dynamically get categories for each item row (in case parts list changes)
   const getCategories = useMemo(
     () => Array.from(new Set(parts.map((p) => p.category).filter(Boolean))),
@@ -139,7 +137,7 @@ const TransactionForm = ({
       setApprovedAt(initial.approvedAt ? initial.approvedAt.slice(0, 16) : "");
       setUpdateHistory(initial.updateHistory || []);
     } else if (open) {
-      setTransactionId("");
+      setTransactionId(""); // Just clear, do not generate
       setDate("");
       setItems([{ ...emptyItem }]);
       setTransactionMethod("");
@@ -208,7 +206,7 @@ const TransactionForm = ({
           onSubmit={(e) => {
             e.preventDefault();
             onSave({
-              transactionId,
+              branch: loggedUser?.branch || "",
               date,
               items,
               total,
@@ -231,12 +229,6 @@ const TransactionForm = ({
           <div className={styles.section}>
             <div className={styles.sectionTitle}>Transaction Info</div>
             <div className={styles.grid2col}>
-              <FloatingLabelInput
-                label="Transaction ID"
-                value={transactionId}
-                onChange={(e) => setTransactionId(e.target.value)}
-                required
-              />
               <FloatingLabelInput
                 label="Date"
                 type="date"

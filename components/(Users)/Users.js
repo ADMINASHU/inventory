@@ -11,7 +11,7 @@ const PAGE_SIZE = 20;
 const Users = () => {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
-  const [type, setType] = useState("STORE");
+  const [type, setType] = useState("");
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);

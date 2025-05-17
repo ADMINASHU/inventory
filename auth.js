@@ -115,6 +115,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.fName = user.fName ?? user.name ?? "User";
         token.eName = user.eName ?? "";
         token.email = user.email;
+        token.branch  = user.branch ?? "";
         token.image = user.image;
         token.provider = user.provider ?? "credentials";
         token.providerAccountId = user.providerAccountId ?? "";
