@@ -1,9 +1,12 @@
 import Stock from '@/components/(Stock)/Stock'
 import React from 'react'
+import { auth } from '@/auth';
 
-const StockPage = () => {
+const StockPage = async () => {
+    const session =await auth();
+    const loggedUser = session?.user;
   return (
-  <Stock />
+  <Stock loggedUser={loggedUser} />
   )
 }
 
