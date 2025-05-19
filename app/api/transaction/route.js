@@ -81,11 +81,18 @@ export async function POST(request) {
     );
 
 
-    const loggedUser = await User.findById(body.to);
+    const loggedUser = await User.findById(body.createdBy);
     if (!loggedUser) {  
       return NextResponse.json({ error: "User not logged in" }, { status: 400 });
     }
-
+    const to = await User.findById(body.to);
+    if (!to) {
+      return NextResponse.json({ error: "User not found" }, { status: 400 });
+    }
+    const from = await User.findById(body.from);
+    if (!from) {  
+      return NextResponse.json({ error: "User not found" }, { status: 400 });
+    }
     let nextSeries = 1;
     if (latest && latest.transactionId) {
       const match = latest.transactionId.match(/-(\d{4})$/);
@@ -95,7 +102,7 @@ export async function POST(request) {
     }
 
     body.transactionId = generateTransactionId(branchName, date, nextSeries);
-    body.transactionStatus = loggedUser.isSecure ? "IN PROCESS" : "RECEIVED";
+    body.transactionStatus = body.transactionType === "SEND" ? to.isSecure ? "IN PROCESS" : "RECEIVED" : from.isSecure ? "IN PROCESS" : "RECEIVED" ;
 
 
     const transaction = await Transaction.create(body);

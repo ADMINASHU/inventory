@@ -54,7 +54,7 @@ const TransactionTable = ({
                   {txn.date ? new Date(txn.date).toLocaleDateString() : ""}
                 </td>
                 <td className={styles.td}>{txn.transactionId}</td>
-                <td className={styles.td}>{txn.from === loggedUser?.sub ? "SEND" : "RECEIVE"}</td>
+                <td className={styles.td}>{txn.from === loggedUser?.sub ? txn.createdBy === loggedUser?.sub ? "SEND": "SEND*" : txn.createdBy === loggedUser?.sub ? "RECEIVE*" : "RECEIVE"}</td>
                 <td className={styles.td}>
                   {getUserName(txn.from === loggedUser?.sub ? txn.to : txn.from)}
                 </td>
@@ -86,7 +86,7 @@ const TransactionTable = ({
                   </ul>
                 </td>
                 <td className={styles.td}>
-                  {txn.from === loggedUser?.sub ? (
+                  {txn.createdBy === loggedUser?.sub ? (
                     <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
                       <button
                         className={styles.iconBtn}

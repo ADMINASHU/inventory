@@ -2,7 +2,14 @@ import React, { useState, useEffect, useMemo } from "react";
 import styles from "./Transaction.module.css";
 
 // Floating label input component
-function FloatingLabelInput({ label, value, onChange, type = "text", required, ...props }) {
+function FloatingLabelInput({
+  label,
+  value,
+  onChange,
+  type = "text",
+  required,
+  ...props
+}) {
   return (
     <div className={styles.floatingInputWrapper}>
       <input
@@ -14,7 +21,11 @@ function FloatingLabelInput({ label, value, onChange, type = "text", required, .
         autoComplete="off"
         {...props}
       />
-      <label className={`${styles.floatingLabel} ${value ? styles.floatingLabelActive : ""}`}>
+      <label
+        className={`${styles.floatingLabel} ${
+          value ? styles.floatingLabelActive : ""
+        }`}
+      >
         {label}
       </label>
     </div>
@@ -32,7 +43,11 @@ function FloatingLabelTextarea({ label, value, onChange, required, ...props }) {
         rows={2}
         {...props}
       />
-      <label className={`${styles.floatingLabel} ${value ? styles.floatingLabelActive : ""}`}>
+      <label
+        className={`${styles.floatingLabel} ${
+          value ? styles.floatingLabelActive : ""
+        }`}
+      >
         {label}
       </label>
     </div>
@@ -56,9 +71,9 @@ const TransactionForm = ({
   const [total, setTotal] = useState(0);
   const [transactionMethod, setTransactionMethod] = useState("");
   const [transactionType, setTransactionType] = useState("");
-  const [from, setFrom] = useState(loggedUser?.sub || "");
-  const [to, setTo] = useState(loggedUser?.sub || "");
-  const [createdBy, setCreatedBy] = useState(loggedUser?.sub || "");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [createdBy, setCreatedBy] = useState("");
   const [note, setNote] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [isDeleted, setIsDeleted] = useState(false);
@@ -79,14 +94,22 @@ const TransactionForm = ({
 
   // Helper to get partId by category and partName
   const getPartId = (category, partName) => {
-    const found = parts.find((p) => p.category === category && p.partName === partName);
+    const found = parts.find(
+      (p) => p.category === category && p.partName === partName
+    );
     return found ? found._id : "";
   };
 
   // Helper to get available "To" users (exclude selected "From")
-  const availableToUsers = useMemo(() => users.filter((u) => u._id !== from), [users, from]);
+  const availableToUsers = useMemo(
+    () => users.filter((u) => u._id !== from),
+    [users, from]
+  );
   const availableFromUsers = useMemo(
-    () => users.filter((u) => u._id !== to && u.type === "STORE" ||  u._id !== to && u.isSecure === false),
+    () =>
+      users.filter(
+        (u) => (u._id !== to && u.type === "STORE") || u.isSecure === false
+      ),
     [users, to]
   );
 
@@ -105,7 +128,9 @@ const TransactionForm = ({
         initial.items && initial.items.length > 0
           ? initial.items.map((item) => {
               if (item.partId || item._id) {
-                const part = parts.find((p) => p._id === (item.partId || item._id));
+                const part = parts.find(
+                  (p) => p._id === (item.partId || item._id)
+                );
                 return {
                   ...item,
                   partId: item.partId || item._id || "",
@@ -123,7 +148,11 @@ const TransactionForm = ({
       setTo(initial.to || "");
       setCreatedBy(initial.createdBy || "");
       setNote(initial.note || "");
-      setAttachments(initial.attachment && initial.attachment.length > 0 ? initial.attachment : []);
+      setAttachments(
+        initial.attachment && initial.attachment.length > 0
+          ? initial.attachment
+          : []
+      );
       setIsDeleted(initial.isDeleted || false);
       setIsApproved(initial.isApproved || false);
       setApprovedBy(initial.approvedBy || "");
@@ -134,8 +163,8 @@ const TransactionForm = ({
       setItems([{ ...emptyItem }]);
       setTransactionMethod("");
       setTransactionType("SEND");
-      setFrom(transactionType === "SEND" ? loggedUser?.sub : "");
-      setTo(transactionType === "RECEIVED" ? loggedUser?.sub : "");
+      setFrom("");
+      setTo("");
       setCreatedBy(loggedUser?.sub || "");
       setNote("");
       setAttachments([]);
@@ -146,6 +175,13 @@ const TransactionForm = ({
       setUpdateHistory([]);
     }
   }, [open, initial, parts]);
+
+  useEffect(() => {
+    if (open) {
+      setFrom(transactionType === "SEND" ? loggedUser?.sub : "");
+      setTo(transactionType === "RECEIVED" ? loggedUser?.sub : "");
+    }
+  }, [transactionType]);
 
   // Update total automatically when items change
   useEffect(() => {
@@ -175,15 +211,19 @@ const TransactionForm = ({
   };
 
   const handleAddItem = () => setItems((items) => [...items, { ...emptyItem }]);
-  const handleRemoveItem = (idx) => setItems((items) => items.filter((_, i) => i !== idx));
+  const handleRemoveItem = (idx) =>
+    setItems((items) => items.filter((_, i) => i !== idx));
 
   const handleAttachmentChange = (idx, field, value) => {
     setAttachments((attachments) =>
-      attachments.map((att, i) => (i === idx ? { ...att, [field]: value } : att))
+      attachments.map((att, i) =>
+        i === idx ? { ...att, [field]: value } : att
+      )
     );
   };
 
-  const handleAddAttachment = () => setAttachments((atts) => [...atts, { ...emptyAttachment }]);
+  const handleAddAttachment = () =>
+    setAttachments((atts) => [...atts, { ...emptyAttachment }]);
   const handleRemoveAttachment = (idx) =>
     setAttachments((atts) => atts.filter((_, i) => i !== idx));
 
@@ -191,7 +231,9 @@ const TransactionForm = ({
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalCard}>
-        <h3 className={styles.formTitle}>{initial ? "Edit" : "Add"} Transaction</h3>
+        <h3 className={styles.formTitle}>
+          {initial ? "Edit" : "Add"} Transaction
+        </h3>
         <form
           className={styles.form}
           onSubmit={(e) => {
@@ -270,7 +312,9 @@ const TransactionForm = ({
                       </option>
                     ))}
                   </select>
-                  <label className={`${styles.floatingLabel} ${styles.floatingLabelActive}`}>
+                  <label
+                    className={`${styles.floatingLabel} ${styles.floatingLabelActive}`}
+                  >
                     From
                   </label>
                 </div>
@@ -291,7 +335,9 @@ const TransactionForm = ({
                       </option>
                     ))}
                   </select>
-                  <label className={`${styles.floatingLabel} ${styles.floatingLabelActive}`}>
+                  <label
+                    className={`${styles.floatingLabel} ${styles.floatingLabelActive}`}
+                  >
                     To
                   </label>
                 </div>
@@ -336,7 +382,9 @@ const TransactionForm = ({
                   <select
                     className={styles.input}
                     value={item.category || ""}
-                    onChange={(e) => handleItemChange(idx, "category", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(idx, "category", e.target.value)
+                    }
                     required
                   >
                     <option value="">Select Category</option>
@@ -350,7 +398,9 @@ const TransactionForm = ({
                   <select
                     className={styles.input}
                     value={item.partName || ""}
-                    onChange={(e) => handleItemChange(idx, "partName", e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(idx, "partName", e.target.value)
+                    }
                     required
                     disabled={!item.category}
                   >
@@ -369,7 +419,9 @@ const TransactionForm = ({
                     min={0}
                     value={item.count ?? 0}
                     disabled={!item.partName}
-                    onChange={(e) => handleItemChange(idx, "count", Number(e.target.value))}
+                    onChange={(e) =>
+                      handleItemChange(idx, "count", Number(e.target.value))
+                    }
                     required
                   />
                   <div style={{ display: "flex", gap: 4 }}>
@@ -383,7 +435,6 @@ const TransactionForm = ({
                         &minus;
                       </button>
                     )}
-            
                   </div>
                 </div>
               ))}
@@ -413,42 +464,53 @@ const TransactionForm = ({
                 <span>ID</span>
                 <span style={{ minWidth: 60 }}></span>
               </div>
-              {(attachments.length === 0 ? [emptyAttachment] : attachments).map((att, idx) => (
-                <div key={idx} className={styles.itemListRow}>
-                  <input
-                    className={styles.input}
-                    type="text"
-                    value={att.name}
-                    onChange={(e) => handleAttachmentChange(idx, "name", e.target.value)}
-                  />
-                  <input
-                    className={styles.input}
-                    type="text"
-                    value={att.type}
-                    onChange={(e) => handleAttachmentChange(idx, "type", e.target.value)}
-                  />
-                  <input
-                    className={styles.input}
-                    type="number"
-                    min={0}
-                    value={att.id}
-                    onChange={(e) => handleAttachmentChange(idx, "id", Number(e.target.value))}
-                  />
-                  <div style={{ display: "flex", gap: 4 }}>
-                    {attachments.length > 1 && (
-                      <button
-                        className={styles.iconBtn}
-                        type="button"
-                        onClick={() => handleRemoveAttachment(idx)}
-                        title="Remove attachment"
-                      >
-                        &minus;
-                      </button>
-                    )}
-             
+              {(attachments.length === 0 ? [emptyAttachment] : attachments).map(
+                (att, idx) => (
+                  <div key={idx} className={styles.itemListRow}>
+                    <input
+                      className={styles.input}
+                      type="text"
+                      value={att.name}
+                      onChange={(e) =>
+                        handleAttachmentChange(idx, "name", e.target.value)
+                      }
+                    />
+                    <input
+                      className={styles.input}
+                      type="text"
+                      value={att.type}
+                      onChange={(e) =>
+                        handleAttachmentChange(idx, "type", e.target.value)
+                      }
+                    />
+                    <input
+                      className={styles.input}
+                      type="number"
+                      min={0}
+                      value={att.id}
+                      onChange={(e) =>
+                        handleAttachmentChange(
+                          idx,
+                          "id",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                    <div style={{ display: "flex", gap: 4 }}>
+                      {attachments.length > 1 && (
+                        <button
+                          className={styles.iconBtn}
+                          type="button"
+                          onClick={() => handleRemoveAttachment(idx)}
+                          title="Remove attachment"
+                        >
+                          &minus;
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           </div>
 
@@ -460,7 +522,11 @@ const TransactionForm = ({
                   <div key={idx} className={styles.updateHistoryRow}>
                     <span>{hist.updateType}</span>
                     <span>{hist.updatedBy}</span>
-                    <span>{hist.updatedAt ? new Date(hist.updatedAt).toLocaleString() : ""}</span>
+                    <span>
+                      {hist.updatedAt
+                        ? new Date(hist.updatedAt).toLocaleString()
+                        : ""}
+                    </span>
                   </div>
                 ))}
               </div>
