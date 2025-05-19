@@ -29,7 +29,7 @@ function TransactionTable({ loggedUser }) {
   const fetchData = useCallback(async () => {
     if (!loggedUser?.branch) return;
     if (!loggedUser?.sub) return;
-    const res = await fetch(`/api/transaction?userId=${loggedUser.sub}`);
+    const res = await fetch(`/api/transaction?stock=${loggedUser.sub}`);
     if (res.ok) setTransactions(await res.json());
   }, []);
 

@@ -57,14 +57,14 @@ const TransactionForm = ({
   users = [],
   loggedUser,
 }) => {
-  const [transactionId, setTransactionId] = useState("");
+
   const [date, setDate] = useState("");
   const [items, setItems] = useState([{ ...emptyItem }]);
   const [total, setTotal] = useState(0);
   const [transactionMethod, setTransactionMethod] = useState("");
   const [transactionType, setTransactionType] = useState("");
   const [from, setFrom] = useState(loggedUser?.sub || "");
-  const [to, setTo] = useState("");
+  const [to, setTo]  = useState(loggedUser?.sub || "");
   const [createdBy, setCreatedBy] = useState(loggedUser?.sub || "");
   const [note, setNote] = useState("");
   const [transactionStatus, setTransactionStatus] = useState("");
@@ -104,7 +104,7 @@ const TransactionForm = ({
 
   useEffect(() => {
     if (open && initial) {
-      setTransactionId(initial.transactionId || "");
+
       setDate(initial.date ? initial.date.slice(0, 10) : "");
       // Populate category and partName from partId (_id) for each item
       setItems(
@@ -137,16 +137,16 @@ const TransactionForm = ({
       setApprovedAt(initial.approvedAt ? initial.approvedAt.slice(0, 16) : "");
       setUpdateHistory(initial.updateHistory || []);
     } else if (open) {
-      setTransactionId(""); // Just clear, do not generate
+
       setDate("");
       setItems([{ ...emptyItem }]);
       setTransactionMethod("");
       setTransactionType("");
       setFrom(loggedUser?.sub || "");
-      setTo("");
+      setTo(loggedUser?.sub || "");
       setCreatedBy(loggedUser?.sub || "");
       setNote("");
-      setTransactionStatus("");
+      setTransactionStatus("IN PROCESS");
       setAttachments([]);
       setIsDeleted(false);
       setIsApproved(false);
@@ -306,12 +306,12 @@ const TransactionForm = ({
                   To
                 </label>
               </div>}
-              <FloatingLabelInput
+              {/* <FloatingLabelInput
                 label="Transaction Status"
                 value={transactionStatus}
                 onChange={(e) => setTransactionStatus(e.target.value)}
                 required
-              />
+              /> */}
             </div>
             <FloatingLabelTextarea
               label="Note"

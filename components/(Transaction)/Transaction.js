@@ -5,6 +5,7 @@ import TransactionTable from "./TransactionTable";
 import PaginationCard from "./PaginationCard";
 import TransactionForm from "./TransactionForm";
 import styles from "./Transaction.module.css";
+import { set } from "mongoose";
 
 const PAGE_SIZE = 20;
 
@@ -16,6 +17,7 @@ const Transaction = ({ loggedUser }) => {
   const [category, setCategory] = useState("");
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
+  // const [receivedOpen, setReceivedOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
@@ -81,6 +83,24 @@ const Transaction = ({ loggedUser }) => {
     setEditItem(item);
     setModalOpen(true);
   };
+  const handleReceive = async (id) => {
+    setSelectedId(id);
+    const item = data.find((i) => (i._id || data.indexOf(i)) === id);
+    setEditItem({ ...item, transactionStatus: "RECEIVED" });
+
+    const res = await fetch("/api/transaction", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...item, transactionStatus: "RECEIVED" }),
+    });
+    if (res.ok) {
+  
+      setTimeout(() => {
+        
+        fetchData();
+      }, 2000);
+    }
+  };
   const handleDelete = async (id) => {
     setSelectedId(id);
     const item = data.find((i) => (i._id || data.indexOf(i)) === id);
@@ -99,7 +119,7 @@ const Transaction = ({ loggedUser }) => {
       await fetch("/api/transaction", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...obj, _id: editItem._id }),
+        body: JSON.stringify({ ...obj, _id: editItem._id, transactionStatus: "IN PROCESS" }),
       });
     } else {
       await fetch("/api/transaction", {
@@ -129,6 +149,7 @@ const Transaction = ({ loggedUser }) => {
         setSelectedId={setSelectedId}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onReceive={handleReceive}
         loggedUser={loggedUser}
         users={users}
       />
