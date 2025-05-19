@@ -1,11 +1,25 @@
 "use client";
-import React, { useState } from "react";
-import { useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import PaginationCard from "./PaginationCard";
+import StockHeader from "./StockHeader";
+import styles from "./Stock.module.css";
+const PAGE_SIZE = 20;
 
 function TransactionTable({ loggedUser }) {
   const [transactions, setTransactions] = useState([]);
   const [search, setSearch] = useState("");
-    const [parts, setParts] = useState([]);
+  const [category, setCategory] = useState("");
+  const [page, setPage] = useState(1);
+  const [parts, setParts] = useState([]);
+
+  const getPartsName = (id) => {
+    const part = parts.find((part) => String(part._id) === id);
+    return part ? part.partName : "Unknown Part";
+  };
+  const getPartsCategory = (id) => {
+    const part = parts.find((part) => String(part._id) === id);
+    return part ? part.category : "Unknown Category";
+  };
 
   const fetchData = useCallback(async () => {
     if (!loggedUser?.branch) return;
@@ -41,45 +55,46 @@ function TransactionTable({ loggedUser }) {
       idCountMap[id] = { _id: id, count: 0 };
     }
     idCountMap[id].count += item.adjustedCount;
+    idCountMap[id].partName = getPartsName(id);
+    idCountMap[id].category = getPartsCategory(id);
   });
 
   // Convert to array and apply search filter
   let idCountArray = Object.values(idCountMap);
-  if (search.trim()) {
-    idCountArray = idCountArray.filter((item) =>
-      item._id.toLowerCase().includes(search.trim().toLowerCase())
-    );
-  }
 
-  // Pagination
-  const [page, setPage] = useState(1);
-  const ITEMS_PER_PAGE = 10;
-  const totalPages = Math.max(1, Math.ceil(idCountArray.length / ITEMS_PER_PAGE));
-  const paginatedIdCounts = idCountArray.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
-  const getPartsName = (id) => {
-    const part = parts.find((part) => String(part._id) === id);
-    return part ? part.partName : "Unknown Part";
-  }
-  const getPartsCategory = (id) => {
-    const part = parts.find((part) => String(part._id) === id);
-    return part ? part.category : "Unknown Category";
-  }
+  console.log(idCountArray);
+  // Filter by category and search term
+  const filtered = useMemo(
+    () =>
+      idCountArray.filter(
+        (item) =>
+          (!category || item.category === category) &&
+          (!search || item.partName.toLowerCase().includes(search.toLowerCase()))
+      ),
+    [idCountArray, category, search]
+  );
+  const total = filtered.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filtered, page]
+  );
+
+  // Pagination logic for max 5 page buttons
+  let startPage = Math.max(1, page - 2);
+  let endPage = Math.min(totalPages, startPage + 4);
+  if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+  const pageNumbers = [];
+  for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
 
   return (
     <div>
-      <h2 style={{ marginBottom: "1em" }}>{loggedUser.name}'s Stock List</h2>
-      <div style={{ marginBottom: "1em" }}>
-        <input
-          type="text"
-          placeholder="Search _id..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          style={{ padding: "0.5em", width: "250px" }}
-        />
-      </div>
+      <StockHeader
+        category={category}
+        setCategory={setCategory}
+        search={search}
+        setSearch={setSearch}
+      />
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr style={{ background: "#f5f5f5" }}>
@@ -90,45 +105,40 @@ function TransactionTable({ loggedUser }) {
           </tr>
         </thead>
         <tbody>
-          {paginatedIdCounts.length === 0 ? (
+          {paginated.length === 0 ? (
             <tr>
               <td colSpan={3} style={{ textAlign: "center", padding: "1em" }}>
                 No data found
               </td>
             </tr>
           ) : (
-            paginatedIdCounts.map((item, idx) => (
+            paginated.map((item, idx) => (
               <tr key={item._id}>
                 <td style={{ padding: "8px", border: "1px solid #ddd" }}>
-                  {(page - 1) * ITEMS_PER_PAGE + idx + 1}
+                  {(page - 1) * PAGE_SIZE + idx + 1}
                 </td>
-                <td style={{ padding: "8px", border: "1px solid #ddd" }}>{getPartsName(item._id)}</td>
-                <td style={{ padding: "8px", border: "1px solid #ddd" }}>{getPartsCategory(item._id)}</td>
+                <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                  {item.partName}
+                </td>
+                <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                  {item.category}
+                </td>
                 <td style={{ padding: "8px", border: "1px solid #ddd" }}>{item.count}</td>
               </tr>
             ))
           )}
         </tbody>
       </table>
-      <div style={{ marginTop: "1em", display: "flex", alignItems: "center" }}>
-        <button
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-          style={{ padding: "0.5em 1em", marginRight: "1em" }}
-        >
-          Previous
-        </button>
-        <span>
-          Page {page} of {totalPages}
-        </span>
-        <button
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={page === totalPages}
-          style={{ padding: "0.5em 1em", marginLeft: "1em" }}
-        >
-          Next
-        </button>
-      </div>
+      <PaginationCard
+        paginated={paginated}
+        total={total}
+        page={page}
+        setPage={setPage}
+        startPage={startPage}
+        endPage={endPage}
+        pageNumbers={pageNumbers}
+        totalPages={totalPages}
+      />
     </div>
   );
 }
