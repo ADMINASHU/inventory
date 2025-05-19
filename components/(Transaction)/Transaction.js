@@ -45,7 +45,7 @@ const Transaction = ({ loggedUser }) => {
   useEffect(() => {
     fetchParts();
   }, [fetchParts]);
-  
+
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
@@ -94,9 +94,7 @@ const Transaction = ({ loggedUser }) => {
       body: JSON.stringify({ ...item, transactionStatus: "RECEIVED" }),
     });
     if (res.ok) {
-  
       setTimeout(() => {
-        
         fetchData();
       }, 2000);
     }
@@ -119,7 +117,7 @@ const Transaction = ({ loggedUser }) => {
       await fetch("/api/transaction", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...obj, _id: editItem._id, transactionStatus: "IN PROCESS" }),
+        body: JSON.stringify({ ...obj, _id: editItem._id}),
       });
     } else {
       await fetch("/api/transaction", {

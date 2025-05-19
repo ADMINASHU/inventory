@@ -16,7 +16,11 @@ const UserSchema = new mongoose.Schema({
     required: true,
     default: false,
   },
-
+  isSecure: {
+    type: Boolean,
+    required: true,
+    default: true,
+  },
   verified: { type: Boolean, required: true, default: false },
   fName: { type: String, required: true, default: "User" },
   eName: { type: String },

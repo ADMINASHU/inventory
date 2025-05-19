@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Users.module.css';
 
+
 const UserForm = ({ open, onClose, onSave, initial }) => {
   const [fName, setFName] = useState('');
   const [eName, setEName] = useState('');
@@ -11,6 +12,7 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
   const [region, setRegion] = useState('');
   const [type, setType] = useState('STORE');
   const [verified, setVerified] = useState(false);
+  const [isSecure, setIsSecure] = useState(null);
 
   useEffect(() => {
     if (open) {
@@ -23,6 +25,7 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
       setRegion(initial?.region || '');
       setType(initial?.type || 'STORE');
       setVerified(initial?.verified || false);
+      setIsSecure(initial?.isSecure || null);
     }
   }, [open, initial]);
 
@@ -47,6 +50,10 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
             <input type="checkbox" checked={verified} onChange={e => setVerified(e.target.checked)} />
             Verified
           </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input type="checkbox" checked={isSecure} onChange={e => setIsSecure(e.target.checked)} />
+            Secure
+          </label>
         </div>
         <div style={{ marginTop: 18, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
           <button className={styles.pageBtn} onClick={onClose}>Cancel</button>
@@ -60,7 +67,8 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
               branch,
               region,
               type,
-              verified
+              verified,
+              isSecure
             });
           }}>{initial ? 'Update' : 'Add'}</button>
         </div>

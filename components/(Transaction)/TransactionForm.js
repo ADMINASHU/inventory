@@ -1,12 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import styles from "./Transaction.module.css";
 
-// Transaction type options (from model)
-const TRANSACTION_TYPE_OPTIONS = [
-  { value: "SEND", label: "SEND" },
-  { value: "RECEIVED", label: "RECEIVED" },
-];
-
 // Floating label input component
 function FloatingLabelInput({ label, value, onChange, type = "text", required, ...props }) {
   return (
@@ -57,17 +51,15 @@ const TransactionForm = ({
   users = [],
   loggedUser,
 }) => {
-
   const [date, setDate] = useState("");
   const [items, setItems] = useState([{ ...emptyItem }]);
   const [total, setTotal] = useState(0);
   const [transactionMethod, setTransactionMethod] = useState("");
   const [transactionType, setTransactionType] = useState("");
   const [from, setFrom] = useState(loggedUser?.sub || "");
-  const [to, setTo]  = useState(loggedUser?.sub || "");
+  const [to, setTo] = useState(loggedUser?.sub || "");
   const [createdBy, setCreatedBy] = useState(loggedUser?.sub || "");
   const [note, setNote] = useState("");
-  const [transactionStatus, setTransactionStatus] = useState("IN PROCESS");
   const [attachments, setAttachments] = useState([]);
   const [isDeleted, setIsDeleted] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
@@ -93,7 +85,10 @@ const TransactionForm = ({
 
   // Helper to get available "To" users (exclude selected "From")
   const availableToUsers = useMemo(() => users.filter((u) => u._id !== from), [users, from]);
-  const availableFromUsers = useMemo(() => users.filter((u) => u._id !== to && u.type === "STORE"), [users, to]);
+  const availableFromUsers = useMemo(
+    () => users.filter((u) => u._id !== to && u.type === "STORE" ||  u._id !== to && u.isSecure === false),
+    [users, to]
+  );
 
   // Prevent selecting same user in both fields
   useEffect(() => {
@@ -104,7 +99,6 @@ const TransactionForm = ({
 
   useEffect(() => {
     if (open && initial) {
-
       setDate(initial.date ? initial.date.slice(0, 10) : "");
       // Populate category and partName from partId (_id) for each item
       setItems(
@@ -129,7 +123,6 @@ const TransactionForm = ({
       setTo(initial.to || "");
       setCreatedBy(initial.createdBy || "");
       setNote(initial.note || "");
-      setTransactionStatus(initial.transactionStatus || "");
       setAttachments(initial.attachment && initial.attachment.length > 0 ? initial.attachment : []);
       setIsDeleted(initial.isDeleted || false);
       setIsApproved(initial.isApproved || false);
@@ -137,16 +130,14 @@ const TransactionForm = ({
       setApprovedAt(initial.approvedAt ? initial.approvedAt.slice(0, 16) : "");
       setUpdateHistory(initial.updateHistory || []);
     } else if (open) {
-
-      setDate("");
+      setDate(new Date().toISOString().slice(0, 10));
       setItems([{ ...emptyItem }]);
       setTransactionMethod("");
-      setTransactionType("");
-      setFrom(loggedUser?.sub || "");
-      setTo(loggedUser?.sub || "");
+      setTransactionType("SEND");
+      setFrom(transactionType === "SEND" ? loggedUser?.sub : "");
+      setTo(transactionType === "RECEIVED" ? loggedUser?.sub : "");
       setCreatedBy(loggedUser?.sub || "");
       setNote("");
-      setTransactionStatus("IN PROCESS");
       setAttachments([]);
       setIsDeleted(false);
       setIsApproved(false);
@@ -216,7 +207,6 @@ const TransactionForm = ({
               to,
               createdBy,
               note,
-              transactionStatus,
               attachment: attachments,
               isDeleted,
               isApproved,
@@ -237,22 +227,6 @@ const TransactionForm = ({
                 required
                 placeholder="" // Ensure no placeholder for date
               />
-              {/* Secure Transaction select */}
-              <div className={styles.floatingInputWrapper}>
-                <select
-                  className={styles.floatingInput}
-                  value={transactionStatus}
-                  onChange={(e) => setTransactionStatus(e.target.value)}
-                  required
-                >
-                  {/* <option value="">Secure Transaction?</option> */}
-                  <option value="IN PROCESS">Yes</option>
-                  <option value="RECEIVED">No</option>
-                </select>
-                <label className={styles.floatingLabel + " " /*+ (secureTransaction ? styles.floatingLabelActive : "")*/}>
-                  Secure Transaction
-                </label>
-              </div>
               <FloatingLabelInput
                 label="Transaction Method"
                 value={transactionMethod}
@@ -268,67 +242,60 @@ const TransactionForm = ({
                   required
                 >
                   <option value="">Select Transaction Type</option>
-                  {TRANSACTION_TYPE_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
+                  <option value="SEND">SEND</option>
+                  <option value="RECEIVED">RECEIVED</option>
                 </select>
                 <label
-                  className={`${styles.floatingLabel} ${transactionType ? styles.floatingLabelActive : ""}`}
+                  className={`${styles.floatingLabel} ${
+                    transactionType ? styles.floatingLabelActive : ""
+                  }`}
                 >
                   Transaction Type
                 </label>
               </div>
               {/* To dropdown */}
-             { transactionType === "RECEIVED" && <div className={styles.floatingInputWrapper}>
-                <select
-                  className={styles.floatingInput}
-                  value={from}
-                  onChange={(e) => setFrom(e.target.value)}
-                  required
-                  disabled={!from}
-                >
-                  <option value="">Select From User</option>
-                  {availableFromUsers.map((u) => (
-                    <option key={u._id} value={u._id}>
-                      {u.fName}
-                    </option>
-                  ))}
-                </select>
-                <label
-                  className={`${styles.floatingLabel} ${from ? styles.floatingLabelActive : ""}`}
-                >
-                  From
-                </label>
-              </div>}
-             { transactionType === "SEND" && <div className={styles.floatingInputWrapper}>
-                <select
-                  className={styles.floatingInput}
-                  value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                  required
-                  disabled={!from}
-                >
-                  <option value="">Select To User</option>
-                  {availableToUsers.map((u) => (
-                    <option key={u._id} value={u._id}>
-                      {u.fName}
-                    </option>
-                  ))}
-                </select>
-                <label
-                  className={`${styles.floatingLabel} ${to ? styles.floatingLabelActive : ""}`}
-                >
-                  To
-                </label>
-              </div>}
-              {/* <FloatingLabelInput
-                label="Transaction Status"
-                value={transactionStatus}
-                onChange={(e) => setTransactionStatus(e.target.value)}
-                required
-              /> */}
+              {transactionType === "RECEIVED" && (
+                <div className={styles.floatingInputWrapper}>
+                  <select
+                    className={styles.floatingInput}
+                    value={from}
+                    onChange={(e) => setFrom(e.target.value)}
+                    required
+                    // disabled={!from}
+                  >
+                    <option value="">Select From User</option>
+                    {availableFromUsers.map((u) => (
+                      <option key={u._id} value={u._id}>
+                        {u.fName}
+                      </option>
+                    ))}
+                  </select>
+                  <label className={`${styles.floatingLabel} ${styles.floatingLabelActive}`}>
+                    From
+                  </label>
+                </div>
+              )}
+              {transactionType === "SEND" && (
+                <div className={styles.floatingInputWrapper}>
+                  <select
+                    className={styles.floatingInput}
+                    value={to}
+                    onChange={(e) => setTo(e.target.value)}
+                    required
+                    // disabled={!from}
+                  >
+                    <option value="">Select To User</option>
+                    {availableToUsers.map((u) => (
+                      <option key={u._id} value={u._id}>
+                        {u.fName}
+                      </option>
+                    ))}
+                  </select>
+                  <label className={`${styles.floatingLabel} ${styles.floatingLabelActive}`}>
+                    To
+                  </label>
+                </div>
+              )}
             </div>
             <FloatingLabelTextarea
               label="Note"
@@ -339,14 +306,27 @@ const TransactionForm = ({
 
           <div className={styles.section}>
             <div className={styles.sectionTitleRow}>
-              <div className={styles.sectionTitle}>Items</div>
+              <div
+                className={styles.sectionTitle}
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                Items
+                <button
+                  className={styles.iconBtn}
+                  type="button"
+                  onClick={handleAddItem}
+                  title="Add item"
+                >
+                  +
+                </button>
+              </div>
               <div className={styles.totalInline}>Total: {total}</div>
             </div>
             <div className={styles.itemListView}>
               <div className={styles.itemListHeader}>
                 <span>Category</span>
                 <span>Part Name</span>
-                <span>Part ID</span>
+                {/* <span>Part ID</span> */}
                 <span>Count</span>
                 <span style={{ minWidth: 60 }}></span>
               </div>
@@ -388,6 +368,7 @@ const TransactionForm = ({
                     type="number"
                     min={0}
                     value={item.count ?? 0}
+                    disabled={!item.partName}
                     onChange={(e) => handleItemChange(idx, "count", Number(e.target.value))}
                     required
                   />
@@ -402,16 +383,7 @@ const TransactionForm = ({
                         &minus;
                       </button>
                     )}
-                    {idx === items.length - 1 && (
-                      <button
-                        className={styles.iconBtn}
-                        type="button"
-                        onClick={handleAddItem}
-                        title="Add item"
-                      >
-                        +
-                      </button>
-                    )}
+            
                   </div>
                 </div>
               ))}
@@ -419,7 +391,21 @@ const TransactionForm = ({
           </div>
 
           <div className={styles.section}>
-            <div className={styles.sectionTitle}>Attachments</div>
+            <div
+              className={styles.sectionTitle}
+              style={{ display: "flex", alignItems: "center", gap: "8px" }}
+            >
+              Attachments
+              <button
+                className={styles.iconBtn}
+                type="button"
+                onClick={handleAddAttachment}
+                title="Add attachment"
+              >
+                +
+              </button>
+            </div>
+
             <div className={styles.itemListView}>
               <div className={styles.itemListHeader}>
                 <span>Name</span>
@@ -449,7 +435,7 @@ const TransactionForm = ({
                     onChange={(e) => handleAttachmentChange(idx, "id", Number(e.target.value))}
                   />
                   <div style={{ display: "flex", gap: 4 }}>
-                    {attachments.length > 0 && (
+                    {attachments.length > 1 && (
                       <button
                         className={styles.iconBtn}
                         type="button"
@@ -459,16 +445,7 @@ const TransactionForm = ({
                         &minus;
                       </button>
                     )}
-                    {idx === attachments.length - 1 && (
-                      <button
-                        className={styles.iconBtn}
-                        type="button"
-                        onClick={handleAddAttachment}
-                        title="Add attachment"
-                      >
-                        +
-                      </button>
-                    )}
+             
                   </div>
                 </div>
               ))}

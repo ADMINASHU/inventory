@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectToServiceEaseDB from "@/lib/serviceDB";
 import { Transaction } from "@/models/Transaction";
+import User from "@/models/User";
 
 // Helper to parse JSON body for PUT/DELETE
 async function parseBody(request) {
@@ -79,6 +80,12 @@ export async function POST(request) {
       { sort: { transactionId: -1 } }
     );
 
+
+    const loggedUser = await User.findById(body.to);
+    if (!loggedUser) {  
+      return NextResponse.json({ error: "User not logged in" }, { status: 400 });
+    }
+
     let nextSeries = 1;
     if (latest && latest.transactionId) {
       const match = latest.transactionId.match(/-(\d{4})$/);
@@ -88,6 +95,8 @@ export async function POST(request) {
     }
 
     body.transactionId = generateTransactionId(branchName, date, nextSeries);
+    body.transactionStatus = loggedUser.isSecure ? "IN PROCESS" : "RECEIVED";
+
 
     const transaction = await Transaction.create(body);
     return NextResponse.json(transaction, { status: 201 });

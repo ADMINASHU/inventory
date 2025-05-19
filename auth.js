@@ -67,6 +67,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           image: profile.picture,
           isAdmin: false,
           verified: true,
+          isSecure: true,
           fName: profile.given_name || profile.name || "User",
           eName: "",
           provider: "google",
@@ -112,6 +113,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.isAdmin = user.isAdmin ?? false;
         token.verified = user.verified ?? false;
+        token.isSecure = user.isSecure ?? true;
         token.fName = user.fName ?? user.name ?? "User";
         token.eName = user.eName ?? "";
         token.email = user.email;

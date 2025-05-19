@@ -33,14 +33,13 @@ const TransactionSchema = new mongoose.Schema(
     attachment: [
       {
         name: { type: String, required: true },
-        type: { type: String, required: true },
+        type: { type: String, required: true },       
         id: { type: Number, required: true },
       },
     ],
     transactionStatus: {
       type: String,
-      required: true,
-      enum: ["IN PROCESS", "SUCCESSFUL", "CANCELLED"],
+      enum: ["IN PROCESS", "REVIEW", "CANCELLED", "RECEIVED"],
     },
   },
   { timestamps: true }
