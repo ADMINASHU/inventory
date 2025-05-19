@@ -67,7 +67,7 @@ const TransactionForm = ({
   const [to, setTo]  = useState(loggedUser?.sub || "");
   const [createdBy, setCreatedBy] = useState(loggedUser?.sub || "");
   const [note, setNote] = useState("");
-  const [transactionStatus, setTransactionStatus] = useState("");
+  const [transactionStatus, setTransactionStatus] = useState("IN PROCESS");
   const [attachments, setAttachments] = useState([]);
   const [isDeleted, setIsDeleted] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
@@ -235,7 +235,24 @@ const TransactionForm = ({
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
+                placeholder="" // Ensure no placeholder for date
               />
+              {/* Secure Transaction select */}
+              <div className={styles.floatingInputWrapper}>
+                <select
+                  className={styles.floatingInput}
+                  value={transactionStatus}
+                  onChange={(e) => setTransactionStatus(e.target.value)}
+                  required
+                >
+                  {/* <option value="">Secure Transaction?</option> */}
+                  <option value="IN PROCESS">Yes</option>
+                  <option value="RECEIVED">No</option>
+                </select>
+                <label className={styles.floatingLabel + " " /*+ (secureTransaction ? styles.floatingLabelActive : "")*/}>
+                  Secure Transaction
+                </label>
+              </div>
               <FloatingLabelInput
                 label="Transaction Method"
                 value={transactionMethod}
