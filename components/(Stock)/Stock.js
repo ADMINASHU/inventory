@@ -68,7 +68,6 @@ function TransactionTable({ loggedUser }) {
   // Convert to array and apply search filter
   let idCountArray = Object.values(idCountMap);
 
-
   // Filter by category and search term
   const filtered = useMemo(
     () =>
@@ -94,19 +93,14 @@ function TransactionTable({ loggedUser }) {
   for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
 
   return (
-    <div>
+    <div className={styles.container}>
       <StockHeader
         category={category}
         setCategory={setCategory}
         search={search}
         setSearch={setSearch}
       />
- 
-        <StockTable
-          paginated={paginated}
-          PAGE_SIZE={PAGE_SIZE}
-          page={page}
-        />
+      <StockTable paginated={paginated} PAGE_SIZE={PAGE_SIZE} page={page} />
       <PaginationCard
         paginated={paginated}
         total={total}
