@@ -10,7 +10,7 @@ const StockDetailsPage = async({ params }) => {
  
 
   return (
-    <div className={styles.detailsPage}>
+    <div>
       <StockDetails id={id} loggedUser={loggedUser} />
     </div>
   );
