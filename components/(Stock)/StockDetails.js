@@ -2,19 +2,36 @@
 import React, { useState, useEffect, useCallback } from "react";
 import styles from "@/components/(Stock)/Stock.module.css";
 
-
-const StockDetails = ({ id }) => {
+const StockDetails = ({ id, loggedUser }) => {
   const [item, setItem] = useState(null);
-  const fetchData = useCallback(async () => {
-    if (!id) return;
-    const res = await fetch(`/api/list?id=${id}`);
-    if (res.ok) setItem(await res.json());
-  }, [id]);
+
+  const [stock, setStock] = useState([]);
+  // Fetch stock data from new API
+  useEffect(() => {
+    if (!loggedUser?.sub) return;
+    fetch(`/api/stock?stock=${loggedUser.sub}`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then(setStock);
+  }, [loggedUser?.sub]);
+
+  const getStockById = useCallback(
+    (id) => stock.find((item) => String(item._id) === String(id)),
+    [stock]
+  );
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!id) return;
+    if (stock.length === 0) return;
+    const foundItem = getStockById(id);
+
+    setItem(foundItem);
+  }, [id,stock]);
+
+
+
   const transactions = [];
+
+
 
   if (!item) {
     return (
@@ -71,6 +88,6 @@ const StockDetails = ({ id }) => {
       </div>
     </div>
   );
-}
+};
 
 export default StockDetails;
