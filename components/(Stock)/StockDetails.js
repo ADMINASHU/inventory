@@ -53,7 +53,7 @@ const StockDetails = ({ id, loggedUser }) => {
       <div className={styles.stockHeader}>
         <div className={styles.stockHeaderInner}>
           <button className={styles.backBtn} onClick={() => router.back()} type="button">
-            ← Back
+          Back
           </button>
           <span className={styles.stockHeaderTitle}>Transaction Details</span>
           <input
