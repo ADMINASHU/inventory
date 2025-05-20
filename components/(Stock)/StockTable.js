@@ -1,7 +1,14 @@
 import React from "react";
+import { useRouter } from "next/navigation";
 import styles from "./Stock.module.css";
 
 const StockTable = ({ paginated, PAGE_SIZE, page }) => {
+  const router = useRouter();
+
+  const handleRowDoubleClick = (id) => {
+    router.push(`/stock/${id}`);
+  };
+
   return (
     <div className={styles.card}>
       <table className={styles.table}>
@@ -17,7 +24,7 @@ const StockTable = ({ paginated, PAGE_SIZE, page }) => {
         <tbody>
           {paginated.length === 0 ? (
             <tr>
-              <td colSpan={4} style={{ textAlign: "center", padding: 16 }}>
+              <td colSpan={5} style={{ textAlign: "center", padding: 16 }}>
                 No data found.
               </td>
             </tr>
@@ -32,6 +39,7 @@ const StockTable = ({ paginated, PAGE_SIZE, page }) => {
 
                     cursor: "pointer",
                   }}
+                  onDoubleClick={() => handleRowDoubleClick(item._id)}
                 >
                   <td> {(page - 1) * PAGE_SIZE + idx + 1}</td>
                   <td>{item.partName}</td>

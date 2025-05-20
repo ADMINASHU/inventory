@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import PaginationCard from "./PaginationCard";
 import StockHeader from "./StockHeader";
 import styles from "./Stock.module.css";
@@ -7,76 +7,28 @@ import StockTable from "./StockTable";
 const PAGE_SIZE = 20;
 
 function TransactionTable({ loggedUser }) {
-  const [transactions, setTransactions] = useState([]);
+  const [stock, setStock] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [page, setPage] = useState(1);
-  const [parts, setParts] = useState([]);
 
-  const getPartsName = (id) => {
-    const part = parts.find((part) => String(part._id) === id);
-    return part ? part.partName : "Unknown Part";
-  };
-  const getPartsCategory = (id) => {
-    const part = parts.find((part) => String(part._id) === id);
-    return part ? part.category : "Unknown Category";
-  };
-  const getPartsDescription = (id) => {
-    const part = parts.find((part) => String(part._id) === id);
-    return part ? part.description : "Unknown Description";
-  };
-
-  const fetchData = useCallback(async () => {
-    if (!loggedUser?.branch) return;
+  // Fetch stock data from new API
+  useEffect(() => {
     if (!loggedUser?.sub) return;
-    const res = await fetch(`/api/transaction?stock=${loggedUser.sub}`);
-    if (res.ok) setTransactions(await res.json());
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-  const fetchParts = async () => {
-    const res = await fetch("/api/list");
-    if (res.ok) setParts(await res.json());
-  };
-
-  useEffect(() => {
-    fetchParts();
-  }, []);
-
-  const allItems = transactions.flatMap((tx) =>
-    (tx.items || []).map((item) => ({
-      ...item,
-      adjustedCount: tx.from === loggedUser.sub ? -(item.count || 0) : item.count || 0,
-    }))
-  );
-
-  // Group by _id and sum adjusted counts
-  const idCountMap = {};
-  allItems.forEach((item) => {
-    const id = item._id ? String(item._id) : "Unknown ID";
-    if (!idCountMap[id]) {
-      idCountMap[id] = { _id: id, count: 0 };
-    }
-    idCountMap[id].count += item.adjustedCount;
-    idCountMap[id].partName = getPartsName(id);
-    idCountMap[id].category = getPartsCategory(id);
-    idCountMap[id].description = getPartsDescription(id);
-  });
-
-  // Convert to array and apply search filter
-  let idCountArray = Object.values(idCountMap);
+    fetch(`/api/stock?stock=${loggedUser.sub}`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then(setStock);
+  }, [loggedUser?.sub]);
 
   // Filter by category and search term
   const filtered = useMemo(
     () =>
-      idCountArray.filter(
+      stock.filter(
         (item) =>
           (!category || item.category === category) &&
           (!search || item.partName.toLowerCase().includes(search.toLowerCase()))
       ),
-    [idCountArray, category, search]
+    [stock, category, search]
   );
   const total = filtered.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);

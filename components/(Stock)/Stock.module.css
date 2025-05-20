@@ -161,6 +161,80 @@
   margin-bottom: 0;
 }
 
+.detailsPage {
+  max-width: 900px;
+  margin: 32px auto;
+  padding: 24px;
+  background: var(--card-bg, #fff);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.detailsCard {
+  padding: 24px;
+  background: var(--primary-bg, #f8fafc);
+  border-radius: 12px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.detailsTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--primary, #1e293b);
+}
+
+.detailsGrid {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  font-size: 1.1rem;
+  color: var(--text, #334155);
+}
+
+.transactionsSection {
+  margin-top: 24px;
+}
+
+.transactionsTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--primary, #1e293b);
+}
+
+.noTransactions {
+  padding: 24px;
+  text-align: center;
+  color: var(--muted, #64748b);
+  background: var(--primary-bg, #f8fafc);
+  border-radius: 8px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  background: var(--card-bg, #fff);
+}
+
+.table th, .table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.table th {
+  background: var(--primary-bg, #f8fafc);
+  color: var(--primary, #1e293b);
+  font-weight: 600;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
 @media (max-width: 600px) {
   .header, .pagination {
     flex-direction: column;
