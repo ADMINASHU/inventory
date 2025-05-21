@@ -7,6 +7,8 @@ const StockDetailsPage = async({ params }) => {
   const { id } = await params;
   const session = await auth();
   const loggedUser = session?.user;
+
+
  
 
   return (
