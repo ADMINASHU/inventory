@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import CustomersHeader from "./CustomersHeader";
 import CustomersTable from "./CustomersTable";
-import PaginationCard from "../(List)/PaginationCard";
+import PaginationCard from "./PaginationCard";
 import CustomerForm from "./CustomersForm";
 import styles from "./Customers.module.css";
 
