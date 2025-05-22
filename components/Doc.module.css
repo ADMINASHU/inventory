@@ -1,0 +1,119 @@
+.docWrapper {
+  max-width: 800px;
+  margin: 30px auto;
+  font-family: Arial, sans-serif;
+  background: #fff;
+  padding: 24px;
+}
+
+.title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 8px;
+  text-decoration: underline;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.companyName {
+  font-weight: bold;
+  font-size: 24px;
+  margin-bottom: 2px;
+}
+
+.officeInfo {
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.infoTable {
+  width: 100%;
+  border: 1px solid #000;
+  border-collapse: collapse;
+  margin-bottom: 0;
+}
+
+.infoCellLeft {
+  border: 1px solid #000;
+  padding: 6px 8px;
+  font-size: 15px;
+  vertical-align: top;
+  width: 55%;
+  height: 70px;
+}
+
+.infoCellRight {
+  border: 1px solid #000;
+  padding: 6px 8px;
+  font-size: 15px;
+  vertical-align: top;
+  width: 45%;
+}
+
+.itemsTable {
+  width: 100%;
+  border: 1px solid #000;
+  border-collapse: collapse;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.cell {
+  border: 1px solid #000;
+  padding: 6px 8px;
+  font-size: 15px;
+  vertical-align: top;
+}
+
+.center {
+  text-align: center;
+}
+
+.slno {
+  width: 6%;
+}
+
+.desc {
+  width: 44%;
+}
+
+.qty {
+  width: 10%;
+}
+
+.rate {
+  width: 20%;
+}
+
+.amount {
+  width: 20%;
+}
+
+.itemsTable thead tr {
+  background: #f5f5f5;
+}
+
+.footerRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 32px;
+  font-size: 15px;
+}
+
+.footerNote {
+  font-size: 13px;
+}
+
+.footerRight {
+  text-align: right;
+}
