@@ -1,6 +1,6 @@
 import React from "react";
 import { auth } from "@/auth";
-import Profile from "@/components/Profile";
+import Profile from "@/Components/Profile";
 import styles from "../../components/Profile.module.css";
 
 const ProfilePage = async () => {

@@ -1,7 +1,7 @@
 
 import { auth } from "@/auth";
 import styles from "@/components/(Stock)/Stock.module.css";
-import StockDetails from "@/components/(Stock)/StockDetails";
+import StockDetails from "@/Components/(Stock)/StockDetails";
 
 const StockDetailsPage = async({ params }) => {
   const { id } = await params;

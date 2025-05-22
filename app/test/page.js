@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import Doc from "@/components/Doc";
+import Doc from "@/Components/Doc";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import React from "react";

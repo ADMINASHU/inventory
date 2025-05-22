@@ -81,6 +81,9 @@ export default function Navbar({ isAuthenticated, loggedUser }) {
         <Link href="/users" className={pathname === "/users" ? styles.activeLink : styles.nlink}>
           Users
         </Link>
+        <Link href="/customers" className={pathname === "/customers" ? styles.activeLink : styles.nlink}>
+          Customers
+        </Link>
       </div>
       <div className={styles.profileSection}>
         <Link href="/profile" className={styles.profileContainer}>
