@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import Doc from "@/components/Doc";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -20,6 +21,9 @@ const TestPage = async () => {
         src= {session.user.provider === "google" ? session?.user.image : `/${session?.user.image}`} 
         alt="User"
       />
+      <div>
+        <Doc />
+      </div>
     </div>
   );
 };
