@@ -13,11 +13,13 @@ const TransactionTable = ({
   onReceive,
   loggedUser,
   users = [],
+  customers = [],
 }) => {
   // Helper to get user's fName by id
   const getUserName = (id) => {
     const user = users.find((u) => u._id === id);
-    return user ? user.fName : id;
+    const customer = customers.find((c) => c._id === id);
+    return user ? user.fName : customer ? customer.name : id;
   };
 
   // Modal state for challan

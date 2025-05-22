@@ -6,6 +6,7 @@ import styles from "@/components/(Stock)/Stock.module.css";
 const StockDetails = ({ id, loggedUser }) => {
   const [item, setItem] = useState(null);
   const [users, setUsers] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [stock, setStock] = useState([]);
   const [search, setSearch] = useState(""); // Add search state
@@ -16,9 +17,18 @@ const StockDetails = ({ id, loggedUser }) => {
     if (res.ok) setUsers(await res.json());
   }, []);
 
+  const fetchCustomers = useCallback(async () => {
+    const res = await fetch("/api/customers");
+    if (res.ok) setCustomers(await res.json());
+  }, []);
+
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [fetchCustomers]);
 
   // Fetch stock data from new API
   useEffect(() => {
@@ -34,8 +44,10 @@ const StockDetails = ({ id, loggedUser }) => {
   );
   const getUserName = (id) => {
     const user = users.find((u) => u._id === id);
-    return user ? user.fName : id;
+    const customer = customers.find((c) => c._id === id);
+    return user ? user.fName : customer ? customer.name : id;
   };
+
   useEffect(() => {
     if (!id) return;
     if (stock.length === 0) return;

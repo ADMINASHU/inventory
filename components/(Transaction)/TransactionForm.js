@@ -64,6 +64,7 @@ const TransactionForm = ({
   initial,
   parts = [],
   users = [],
+  customers = [],
   loggedUser,
 }) => {
   const [date, setDate] = useState("");
@@ -102,15 +103,20 @@ const TransactionForm = ({
 
   // Helper to get available "To" users (exclude selected "From")
   const availableToUsers = useMemo(
-    () => users.filter((u) => u._id !== from),
-    [users, from]
+    () => [
+      ...users.filter((u) => u._id !== from ),
+      ...customers.filter((c) => c._id !== from )
+    ],
+    [users, customers, from]
   );
   const availableFromUsers = useMemo(
-    () =>
-      users.filter(
+    () => [
+      ...users.filter(
         (u) => (u._id !== to && u.type === "STORE") || u.isSecure === false
       ),
-    [users, to]
+      ...customers.filter((c) => c._id !== to )
+    ],
+    [users, customers, to]
   );
 
   // Prevent selecting same user in both fields
@@ -308,7 +314,7 @@ const TransactionForm = ({
                     <option value="">Select From User</option>
                     {availableFromUsers.map((u) => (
                       <option key={u._id} value={u._id}>
-                        {u.fName}
+                        {u.fName || u.name}
                       </option>
                     ))}
                   </select>
@@ -331,7 +337,7 @@ const TransactionForm = ({
                     <option value="">Select To User</option>
                     {availableToUsers.map((u) => (
                       <option key={u._id} value={u._id}>
-                        {u.fName}
+                        {u.fName || u.name}
                       </option>
                     ))}
                   </select>

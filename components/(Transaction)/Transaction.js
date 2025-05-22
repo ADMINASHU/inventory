@@ -13,6 +13,7 @@ const Transaction = ({ loggedUser }) => {
   const [data, setData] = useState([]);
   const [parts, setParts] = useState([]);
   const [users, setUsers] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [page, setPage] = useState(1);
@@ -38,6 +39,11 @@ const Transaction = ({ loggedUser }) => {
     if (res.ok) setUsers(await res.json());
   }, []);
 
+  const fetchCustomers = useCallback(async () => {
+    const res = await fetch("/api/customers");
+    if (res.ok) setCustomers(await res.json());
+  }, []);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -49,6 +55,10 @@ const Transaction = ({ loggedUser }) => {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [fetchCustomers]);
 
   const filtered = useMemo(
     () =>
@@ -150,6 +160,7 @@ const Transaction = ({ loggedUser }) => {
         onReceive={handleReceive}
         loggedUser={loggedUser}
         users={users}
+        customers={customers}
       />
       <PaginationCard
         paginated={paginated}
@@ -171,6 +182,7 @@ const Transaction = ({ loggedUser }) => {
         initial={editItem}
         parts={parts}
         users={users}
+        customers={customers}
         loggedUser={loggedUser}
       />
     </div>

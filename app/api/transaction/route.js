@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectToServiceEaseDB from "@/lib/serviceDB";
 import { Transaction } from "@/models/Transaction";
 import User from "@/models/User";
+import Customer from "@/models/Customer";
 
 // Helper to parse JSON body for PUT/DELETE
 async function parseBody(request) {
@@ -85,13 +86,19 @@ export async function POST(request) {
     if (!loggedUser) {  
       return NextResponse.json({ error: "User not logged in" }, { status: 400 });
     }
-    const to = await User.findById(body.to);
+    let to = await User.findById(body.to);
     if (!to) {
-      return NextResponse.json({ error: "User not found" }, { status: 400 });
+      to = await Customer.findById(body.to);
+      if (!to) {
+        return NextResponse.json({ error: "to User not found" }, { status: 400 });
+      }
     }
-    const from = await User.findById(body.from);
-    if (!from) {  
-      return NextResponse.json({ error: "User not found" }, { status: 400 });
+    let from = await User.findById(body.from);
+    if (!from) {
+      from = await Customer.findById(body.from);
+      if (!from) {
+        return NextResponse.json({ error: "from User not found" }, { status: 400 });
+      }
     }
     let nextSeries = 1;
     if (latest && latest.transactionId) {
@@ -102,7 +109,7 @@ export async function POST(request) {
     }
 
     body.transactionId = generateTransactionId(branchName, date, nextSeries);
-    body.transactionStatus = body.transactionType === "SEND" ? to.isSecure ? "IN PROCESS" : "RECEIVED" : from.isSecure ? "IN PROCESS" : "RECEIVED" ;
+    body.transactionStatus = body.transactionType === "SEND" ? to?.isSecure ? "IN PROCESS" : "RECEIVED" : from?.isSecure ? "IN PROCESS" : "RECEIVED" ;
 
 
     const transaction = await Transaction.create(body);
