@@ -10,6 +10,7 @@ import styles from "./Transaction.module.css";
 const PAGE_SIZE = 20;
 
 const Transaction = ({ loggedUser }) => {
+  const [stock, setStock] = useState([]);
   const [data, setData] = useState([]);
   const [parts, setParts] = useState([]);
   const [users, setUsers] = useState([]);
@@ -28,6 +29,15 @@ const Transaction = ({ loggedUser }) => {
     const res = await fetch(`/api/transaction?userId=${loggedUser.sub}`);
     if (res.ok) setData(await res.json());
   }, []);
+
+
+   useEffect(() => {
+      if (!loggedUser?.sub) return;
+      fetch(`/api/stock?stock=${loggedUser.sub}`)
+        .then((res) => (res.ok ? res.json() : []))
+        .then(setStock);
+    }, [loggedUser?.sub]);
+
 
   const fetchParts = useCallback(async () => {
     const res = await fetch("/api/list");
@@ -184,6 +194,7 @@ const Transaction = ({ loggedUser }) => {
         parts={parts}
         users={users}
         customers={customers}
+        stock={stock}
         loggedUser={loggedUser}
       />
     </div>

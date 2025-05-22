@@ -65,6 +65,7 @@ const TransactionForm = ({
   parts = [],
   users = [],
   customers = [],
+  stock = [],
   loggedUser,
 }) => {
   const [date, setDate] = useState("");
@@ -232,6 +233,12 @@ const TransactionForm = ({
     setAttachments((atts) => [...atts, { ...emptyAttachment }]);
   const handleRemoveAttachment = (idx) =>
     setAttachments((atts) => atts.filter((_, i) => i !== idx));
+
+  // Helper to get available stock for a part (by _id)
+  const getAvailableStock = (partId) => {
+    const part = stock.find((s) => s._id === partId);
+    return part ? part.count : 0;
+  };
 
   if (!open) return null;
   return (
@@ -443,6 +450,16 @@ const TransactionForm = ({
                     )}
                   </div>
                 </div>
+              ))}
+              {items.map((item, idx) => (
+                // Show available stock only if partName is selected and count is not yet entered
+                // (i.e., item.count is empty, null, or zero string, but not a valid number > 0)
+                // Hide after count is entered (i.e., item.count is a valid number > 0)
+                item.category && item.partName && (item.count === 0 || item.count === null || item.count === undefined || item.count > getAvailableStock(item._id))  && (
+                  <div key={idx} className={styles.availableStockRow} style={{ color: "#888", fontSize: "0.95em", marginBottom: 4, marginLeft: 2 }}>
+                    Available stock: {getAvailableStock(item._id)}
+                  </div>
+                )
               ))}
             </div>
           </div>
