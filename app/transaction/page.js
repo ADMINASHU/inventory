@@ -1,6 +1,6 @@
 
 import { auth } from '@/auth';
-import Transaction from '@/Components/(Transaction)/Transaction'
+import Transaction from '@/components/(Transaction)/Transaction'
 import React from 'react'
 
 const TransactionPage = async() => {

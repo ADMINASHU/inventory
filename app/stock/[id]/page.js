@@ -1,7 +1,7 @@
 
 import { auth } from "@/auth";
 
-import StockDetails from "@/Components/(Stock)/StockDetails";
+import StockDetails from "@/components/(Stock)/StockDetails";
 
 const StockDetailsPage = async({ params }) => {
   const { id } = await params;

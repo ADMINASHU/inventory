@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
-import styles from "@/Components/(Customers)/Customers.module.css";
+import styles from "@/components/(Customers)/Customers.module.css";
 import React from "react";
-import Customers from "@/Components/(Customers)/Customers";
+import Customers from "@/components/(Customers)/Customers";
 
 
 const CustomersPage = async () => {

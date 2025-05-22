@@ -1,4 +1,4 @@
-import RegisterForm from "@/Components/RegisterForm";
+import RegisterForm from "@/components/RegisterForm";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 const RegisterPage = async () => {

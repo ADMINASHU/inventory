@@ -1,4 +1,4 @@
-import Stock from '@/Components/(Stock)/Stock'
+import Stock from '@/components/(Stock)/Stock'
 import React from 'react'
 import { auth } from '@/auth';
 

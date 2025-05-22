@@ -1,4 +1,4 @@
-import List from '@/Components/(List)/List'
+import List from '@/components/(List)/List'
 import React from 'react'
 
 const ListPage = () => {

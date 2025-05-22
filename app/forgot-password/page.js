@@ -1,5 +1,5 @@
 import React from "react";
-import ForgotPasswordForm from "@/Components/ForgotPasswordForm";
+import ForgotPasswordForm from "@/components/ForgotPasswordForm";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
