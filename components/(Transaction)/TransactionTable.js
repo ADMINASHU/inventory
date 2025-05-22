@@ -30,19 +30,58 @@ const TransactionTable = ({
     if (!challanRef.current) return;
     setPrinting(true);
     try {
-      const canvas = await html2canvas(challanRef.current, { scale: 2 });
+      // A4 size in pt: 595.28 x 841.89, 1cm = 28.35pt, so margins = 28.35pt
+      const margin = 28.35; // 1cm in pt
+      const pdfWidth = 595.28;
+      const pdfHeight = 841.89;
+      const contentWidth = pdfWidth - 2 * margin;
+
+      // Render the DOM node to canvas
+      const canvas = await html2canvas(challanRef.current, { scale: 2, backgroundColor: "#fff" });
       const imgData = canvas.toDataURL("image/png");
+
+      // Calculate image dimensions to fit page width (ignore vertical centering)
+      let imgWidth = contentWidth;
+      let imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // If the image is too tall, scale it down to fit the page height minus top and bottom margin
+      const maxImgHeight = pdfHeight - 2 * margin;
+      if (imgHeight > maxImgHeight) {
+        imgHeight = maxImgHeight;
+        imgWidth = (canvas.width * imgHeight) / canvas.height;
+      }
+
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "pt",
         format: "a4",
       });
-      // Calculate width/height for A4
+
+      // Place image at (left margin, top margin) -- aligns to top, not centered
+      pdf.addImage(imgData, "PNG", margin, margin, imgWidth, imgHeight);
+
+      // Add a line above the footer text
+      const now = new Date();
+      const timestamp = now.toLocaleString();
       const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      const y = pdf.internal.pageSize.getHeight() - margin; // 1cm from bottom
+
+      // Draw a horizontal line (100% width)
+      pdf.setDrawColor(120, 120, 120);
+      pdf.setLineWidth(0.5);
+      pdf.line(margin, y - 14, pageWidth - margin, y - 14);
+
+      // Footer text, center aligned
+      const footerText = `This is a computer-generated challan printed at :${timestamp}.`;
+      pdf.setFontSize(10);
+      pdf.setTextColor(120, 120, 120);
+      const lines = footerText.split('\n');
+      lines.forEach((line, i) => {
+        const textWidth = pdf.getTextWidth(line);
+        const x = (pageWidth - textWidth) / 2;
+        pdf.text(line, x, y + i * 12); // 12pt line height
+      });
+
       pdf.save("challan.pdf");
     } catch (err) {
       alert("Failed to generate PDF");
@@ -55,7 +94,6 @@ const TransactionTable = ({
       {/* Challan Modal */}
       {challanTxn && (
         <div className={styles.modalOverlay} onClick={() => !printing && setChallanTxn(null)}>
-          {/* Attach the ref to a plain div INSIDE modalCard, not to modalCard itself */}
           <div
             className={styles.modalCard}
             onClick={(e) => e.stopPropagation()}
