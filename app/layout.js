@@ -16,8 +16,8 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Techser Analysis App",
-  description: "Techser Service Analysis Dashboard",
+  title: "Techser Inventory App",
+  description: "Techser Inventory Management App",
   links: [
     { rel: "preload", href: "/_next/static/css/app/layout.css", as: "style" },
   ],
