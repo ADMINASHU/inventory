@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import styles from "./Transaction.module.css";
+import Doc from "../Doc";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const TransactionTable = ({
   paginated,
@@ -16,9 +19,68 @@ const TransactionTable = ({
     const user = users.find((u) => u._id === id);
     return user ? user.fName : id;
   };
- 
+
+  // Modal state for challan
+  const [challanTxn, setChallanTxn] = useState(null);
+  const [printing, setPrinting] = useState(false);
+  const challanRef = useRef(null);
+
+  // PDF download handler using jsPDF and html2canvas
+  const handleDownloadPDF = async () => {
+    if (!challanRef.current) return;
+    setPrinting(true);
+    try {
+      const canvas = await html2canvas(challanRef.current, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4",
+      });
+      // Calculate width/height for A4
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      pdf.save("challan.pdf");
+    } catch (err) {
+      alert("Failed to generate PDF");
+    }
+    setPrinting(false);
+  };
+
   return (
     <div className={styles.tableWrapper}>
+      {/* Challan Modal */}
+      {challanTxn && (
+        <div className={styles.modalOverlay} onClick={() => !printing && setChallanTxn(null)}>
+          {/* Attach the ref to a plain div INSIDE modalCard, not to modalCard itself */}
+          <div
+            className={styles.modalCard}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ marginBottom: 12, fontWeight: 600, fontSize: 18, textAlign: "center" }}>
+              Challan Preview
+            </div>
+            <div ref={challanRef}>
+              <Doc txn={challanTxn} users={users} />
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+              <button className={styles.addBtn} onClick={handleDownloadPDF} disabled={printing}>
+                Download PDF
+              </button>
+              <button
+                className={styles.iconBtn}
+                onClick={() => setChallanTxn(null)}
+                disabled={printing}
+              >
+                ❌
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <table className={styles.table}>
         <thead>
           <tr>
@@ -54,7 +116,15 @@ const TransactionTable = ({
                   {txn.date ? new Date(txn.date).toLocaleDateString() : ""}
                 </td>
                 <td className={styles.td}>{txn.transactionId}</td>
-                <td className={styles.td}>{txn.from === loggedUser?.sub ? txn.createdBy === loggedUser?.sub ? "SEND": "SEND*" : txn.createdBy === loggedUser?.sub ? "RECEIVE*" : "RECEIVE"}</td>
+                <td className={styles.td}>
+                  {txn.from === loggedUser?.sub
+                    ? txn.createdBy === loggedUser?.sub
+                      ? "SEND"
+                      : "SEND*"
+                    : txn.createdBy === loggedUser?.sub
+                    ? "RECEIVE*"
+                    : "RECEIVE"}
+                </td>
                 <td className={styles.td}>
                   {getUserName(txn.from === loggedUser?.sub ? txn.to : txn.from)}
                 </td>
@@ -108,6 +178,17 @@ const TransactionTable = ({
                       >
                         🗑️
                       </button>
+                      <button
+                        className={styles.iconBtn}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setChallanTxn(txn);
+                        }}
+                        title="Create Challan"
+                      >
+                        📄
+                      </button>
                     </div>
                   ) : txn.transactionStatus === "IN PROCESS" ? (
                     <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
@@ -122,7 +203,9 @@ const TransactionTable = ({
                         ✅
                       </button>
                     </div>
-                  ): <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>  </div>}
+                  ) : (
+                    <div style={{ display: "flex", gap: "6px", alignItems: "center" }}> </div>
+                  )}
                 </td>
               </tr>
             ))

@@ -1,7 +1,13 @@
 import React from "react";
 import styles from "./Doc.module.css";
 
-const Doc = () => (
+// Helper to get user's fName by id
+const getUserName = (id, users) => {
+  const user = users?.find((u) => u._id === id);
+  return user ? user.fName : id;
+};
+
+const Doc = ({ txn = {}, users = [] }) => (
   <div className={styles.docWrapper}>
     <div className={styles.title}>
       DELIVERY CHALLAN
@@ -11,8 +17,8 @@ const Doc = () => (
         <span className={styles.bold}>GSTIN/UIN: 10AABCT0359D</span>
       </div>
       <div>
-        <div>No.:</div>
-        <div>Dated:</div>
+        <div>No.: {txn.transactionId || ""}</div>
+        <div>Dated: {txn.date ? new Date(txn.date).toLocaleDateString() : ""}</div>
       </div>
     </div>
     <div className={styles.companyName}>
@@ -30,13 +36,13 @@ const Doc = () => (
       <tbody>
         <tr>
           <td className={styles.infoCellLeft}>
-            <div>M/s.</div>
+            <div>M/s. {getUserName(txn.to, users)}</div>
           </td>
           <td className={styles.infoCellRight}>
-            <div>Order Date:</div>
-            <div>Order No.:</div>
+            <div>Order Date: {txn.date ? new Date(txn.date).toLocaleDateString() : ""}</div>
+            <div>Order No.: {txn.transactionId || ""}</div>
             <div>GSTIN:</div>
-            <div>Mode of despatch:</div>
+            <div>Mode of despatch: {txn.transactionMethod || ""}</div>
           </td>
         </tr>
       </tbody>
@@ -52,13 +58,28 @@ const Doc = () => (
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td className={styles.cell} style={{ height: 120 }}></td>
-          <td className={styles.cell}></td>
-          <td className={styles.cell}></td>
-          <td className={styles.cell}></td>
-          <td className={styles.cell}></td>
-        </tr>
+        {txn.items && txn.items.length > 0 ? (
+          txn.items.map((item, idx) => (
+            <tr key={idx}>
+              <td className={styles.cell}>{idx + 1}</td>
+              <td className={styles.cell}>
+                {item.partName || item._id}
+                {item.category ? ` (${item.category})` : ""}
+              </td>
+              <td className={styles.cell}>{item.count}</td>
+              <td className={styles.cell}></td>
+              <td className={styles.cell}></td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td className={styles.cell} style={{ height: 120 }}></td>
+            <td className={styles.cell}></td>
+            <td className={styles.cell}></td>
+            <td className={styles.cell}></td>
+            <td className={styles.cell}></td>
+          </tr>
+        )}
       </tbody>
     </table>
     <div className={styles.footerRow}>
