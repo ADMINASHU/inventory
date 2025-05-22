@@ -161,6 +161,7 @@ const Transaction = ({ loggedUser }) => {
         loggedUser={loggedUser}
         users={users}
         customers={customers}
+        parts={parts}
       />
       <PaginationCard
         paginated={paginated}

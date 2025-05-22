@@ -14,6 +14,7 @@ const TransactionTable = ({
   loggedUser,
   users = [],
   customers = [],
+  parts = [],
 }) => {
   // Helper to get user's fName by id
   const getUserName = (id) => {
@@ -22,6 +23,14 @@ const TransactionTable = ({
     return user ? user.fName : customer ? customer.name : id;
   };
 
+  const getItemName = (id) => {
+    const item = parts.find((i) => i._id === id);
+    return item ? item.partName : id;
+  };
+  const getItemCategory = (id) => {
+    const item = parts.find((i) => i._id === id);
+    return item ? item.category : id;
+  };
   // Modal state for challan
   const [challanTxn, setChallanTxn] = useState(null);
   const [printing, setPrinting] = useState(false);
@@ -77,7 +86,7 @@ const TransactionTable = ({
       const footerText = `This is a computer-generated challan printed at :${timestamp}.`;
       pdf.setFontSize(10);
       pdf.setTextColor(120, 120, 120);
-      const lines = footerText.split('\n');
+      const lines = footerText.split("\n");
       lines.forEach((line, i) => {
         const textWidth = pdf.getTextWidth(line);
         const x = (pageWidth - textWidth) / 2;
@@ -96,10 +105,7 @@ const TransactionTable = ({
       {/* Challan Modal */}
       {challanTxn && (
         <div className={styles.modalOverlay} onClick={() => !printing && setChallanTxn(null)}>
-          <div
-            className={styles.modalCard}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
             <div style={{ marginBottom: 12, fontWeight: 600, fontSize: 18, textAlign: "center" }}>
               Challan Preview
             </div>
@@ -177,20 +183,12 @@ const TransactionTable = ({
                     {txn.items &&
                       txn.items.map((item, i) => (
                         <li key={i}>
-                          <span className={styles.itemPartId}>{item._id}</span>
-                          {item.partName && (
+                          <span>
                             <>
-                              {" "}
-                              - <span>{item.partName}</span>
+                              {getItemName(item._id)}{" "} : <span className={styles.itemCount}>{item.count}</span>
+                              <br />(<span>{getItemCategory(item._id)}</span>)
                             </>
-                          )}
-                          {item.category && (
-                            <>
-                              {" "}
-                              (<span>{item.category}</span>)
-                            </>
-                          )}
-                          : <span className={styles.itemCount}>{item.count}</span>
+                          </span>
                         </li>
                       ))}
                   </ul>
