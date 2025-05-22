@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import styles from "@/components/(Customers)/Customers.module.css";
+import styles from "@/Components/(Customers)/Customers.module.css";
 import React from "react";
 import Customers from "@/Components/(Customers)/Customers";
 

@@ -1,6 +1,6 @@
 
 import { auth } from "@/auth";
-import styles from "@/components/(Stock)/Stock.module.css";
+
 import StockDetails from "@/Components/(Stock)/StockDetails";
 
 const StockDetailsPage = async({ params }) => {

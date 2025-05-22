@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import styles from "../../components/Users.module.css";
+import styles from "@/Components/(Users)/Users.module.css";
 import React from "react";
 import Users from "@/Components/(Users)/Users";
 

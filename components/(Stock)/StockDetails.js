@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import styles from "@/components/(Stock)/Stock.module.css";
+import styles from "@/Components/(Stock)/Stock.module.css";
 
 const StockDetails = ({ id, loggedUser }) => {
   const [item, setItem] = useState(null);
