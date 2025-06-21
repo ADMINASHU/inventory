@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema({
   fName: { type: String, required: true, default: "User" },
   eName: { type: String },
   image: { type: String, required: true, default: "user.png" },
-  designation: { type: String },
+  address: { type: String },
   region: { type: String },
   branch: { type: String },
   type: { type: String , required: true, default: "USER", enum: ["USER", "STORE"] },

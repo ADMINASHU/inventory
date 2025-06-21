@@ -7,7 +7,7 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
   const [eName, setEName] = useState('');
   const [email, setEmail] = useState('');
   const [mobileNo, setMobileNo] = useState('');
-  const [designation, setDesignation] = useState('');
+  const [address, setAddress] = useState('');
   const [branch, setBranch] = useState('');
   const [region, setRegion] = useState('');
   const [type, setType] = useState('STORE');
@@ -20,7 +20,7 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
       setEName(initial?.eName || '');
       setEmail(initial?.email || '');
       setMobileNo(initial?.mobileNo || '');
-      setDesignation(initial?.designation || '');
+      setAddress(initial?.address || '');
       setBranch(initial?.branch || '');
       setRegion(initial?.region || '');
       setType(initial?.type || 'STORE');
@@ -42,7 +42,7 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
           <input className={styles.input} placeholder="Last Name" value={eName} onChange={e => setEName(e.target.value)} />
           <input className={styles.input} placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
           <input className={styles.input} placeholder="Mobile No" value={mobileNo} onChange={e => setMobileNo(e.target.value)} />
-          <input className={styles.input} placeholder="Designation" value={designation} onChange={e => setDesignation(e.target.value)} />
+          <input className={styles.input} placeholder="Address" value={address} onChange={e => setAddress(e.target.value)} />
           <input className={styles.input} placeholder="Branch" value={branch} onChange={e => setBranch(e.target.value)} />
           <input className={styles.input} placeholder="Region" value={region} onChange={e => setRegion(e.target.value)} />
           <input className={styles.input} placeholder="Type" value={type} onChange={e => setType(e.target.value)} />
@@ -63,7 +63,7 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
               eName,
               email,
               mobileNo,
-              designation,
+              address,
               branch,
               region,
               type,

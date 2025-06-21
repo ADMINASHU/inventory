@@ -11,7 +11,7 @@ const UsersTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) 
             <th>Name</th>
             <th>Email</th>
             <th>Mobile No</th>
-            <th>Designation</th>
+            <th>Address</th>
             <th>Branch</th>
             <th>Region</th>
             <th>Verified</th>
@@ -38,10 +38,16 @@ const UsersTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) 
                 onClick={() => setSelectedId(isSelected ? null : rowId)}
               >
                 <td>{idx + 1}</td>
-                <td>{`${user.fName || ''} ${user.eName || ''}`}</td>
+                <td>{`${user.fName || ''} ${user.eName || ''}`} {user.isSecure ? (
+                  <span style={{ verticalAlign: 'middle', marginRight: 4 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#ff4c4c" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline' }}>
+                      <path d="M12 2L4 5V11C4 16.52 7.58 21.74 12 23C16.42 21.74 20 16.52 20 11V5L12 2Z"/>
+                    </svg>
+                  </span>
+                ) : null}</td>
                 <td>{user.email}</td>
                 <td>{user.mobileNo}</td>
-                <td>{user.designation}</td>
+                <td>{user.address}</td>
                 <td>{user.branch}</td>
                 <td>{user.region}</td>
           
