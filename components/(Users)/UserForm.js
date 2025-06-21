@@ -2,17 +2,19 @@ import React, { useState, useEffect } from 'react';
 import styles from './Users.module.css';
 
 
-const UserForm = ({ open, onClose, onSave, initial }) => {
+const UserForm = ({ open, onClose, onSave, initial, branches = [] }) => {
   const [fName, setFName] = useState('');
   const [eName, setEName] = useState('');
   const [email, setEmail] = useState('');
   const [mobileNo, setMobileNo] = useState('');
   const [address, setAddress] = useState('');
-  const [branch, setBranch] = useState('');
+  const [branch, setBranch] = useState("");
   const [region, setRegion] = useState('');
   const [type, setType] = useState('STORE');
   const [verified, setVerified] = useState(false);
   const [isSecure, setIsSecure] = useState(null);
+  const [inBranch, setInBranch] = useState(false);
+
 
   useEffect(() => {
     if (open) {
@@ -29,6 +31,16 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
     }
   }, [open, initial]);
 
+  // Auto-fill region when branch changes
+  useEffect(() => {
+    if (branch && branches.length > 0) {
+      const selectedBranch = branches.find(b => b._id === branch);
+      setRegion(selectedBranch?.region || '');
+    } else {
+      setRegion('');
+    }
+  }, [branch, branches]);
+
   if (!open) return null;
   return (
     <div style={{
@@ -43,8 +55,15 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
           <input className={styles.input} placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
           <input className={styles.input} placeholder="Mobile No" value={mobileNo} onChange={e => setMobileNo(e.target.value)} />
           <input className={styles.input} placeholder="Address" value={address} onChange={e => setAddress(e.target.value)} />
-          <input className={styles.input} placeholder="Branch" value={branch} onChange={e => setBranch(e.target.value)} />
-          <input className={styles.input} placeholder="Region" value={region} onChange={e => setRegion(e.target.value)} />
+          {/* Branch dropdown */}
+          <select className={styles.input} value={branch} onChange={e => setBranch(e.target.value)}>
+            <option value="">Select Branch</option>
+            {branches.map(b => (
+              <option key={b._id} value={b._id}>{b.name}</option>
+            ))}
+          </select>
+          {/* Display region as readonly text, not as an input */}
+          <input className={styles.input} placeholder="Region" value={region} readOnly disabled />
           <input className={styles.input} placeholder="Type" value={type} onChange={e => setType(e.target.value)} />
           <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <input type="checkbox" checked={verified} onChange={e => setVerified(e.target.checked)} />
@@ -65,7 +84,6 @@ const UserForm = ({ open, onClose, onSave, initial }) => {
               mobileNo,
               address,
               branch,
-              region,
               type,
               verified,
               isSecure

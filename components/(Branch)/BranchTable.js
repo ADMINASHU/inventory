@@ -1,20 +1,20 @@
 import React from 'react';
-import styles from './Users.module.css';
+import styles from './Branch.module.css';
 
-const UsersTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete, branches = [] }) => (
+const BranchTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) => (
   <div className={styles.card}>
     <div className={styles.tableWrapper}>
       <table className={styles.table}>
         <thead>
           <tr>
             <th>S No</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Mobile No</th>
-            <th>Address</th>
             <th>Branch</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>GST</th>
+            <th>Mobile No</th>
             <th>Region</th>
-            <th>Verified</th>
+        
             <th></th>
           </tr>
         </thead>
@@ -23,11 +23,9 @@ const UsersTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete, br
             <tr>
               <td colSpan={10} style={{ textAlign: 'center', padding: 16 }}>No data found.</td>
             </tr>
-          ) : paginated.map((user, idx) => {
-            const rowId = user._id || idx;
+          ) : paginated.map((branch, idx) => {
+            const rowId = branch._id || idx;
             const isSelected = selectedId === rowId;
-            // Find branch object
-            const branchObj = branches.find(b => b._id === user.branch);
             return (
               <tr
                 key={rowId}
@@ -40,24 +38,13 @@ const UsersTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete, br
                 onClick={() => setSelectedId(isSelected ? null : rowId)}
               >
                 <td>{idx + 1}</td>
-                <td>{`${user.fName || ''} ${user.eName || ''}`} {user.isSecure ? (
-                  <span style={{ verticalAlign: 'middle', marginRight: 4 }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#ff4c4c" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline' }}>
-                      <path d="M12 2L4 5V11C4 16.52 7.58 21.74 12 23C16.42 21.74 20 16.52 20 11V5L12 2Z"/>
-                    </svg>
-                  </span>
-                ) : null}</td>
-                <td>{user.email}</td>
-                <td>{user.mobileNo}</td>
-                <td>{user.address}</td>
-                <td>{branchObj ? branchObj.name : ""}</td>
-                <td>{branchObj ? branchObj.region : ''}</td>
-                <td style={{
-                  color: user.verified ? "green" : "red",
-                  textAlign: "center"
-                }}>
-                  {user.verified ? "Verified" : "Blocked"}
-                </td>
+                <td>{branch.name}</td>
+                <td>{branch.email}</td>
+                <td>{branch.address}</td>
+                <td>{branch.gst}</td>
+                <td>{branch.mobileNo}</td>
+                <td>{branch.region}</td>
+            
                 <td style={{ position: 'relative' }}>
                   {isSelected && (
                     <span
@@ -95,4 +82,4 @@ const UsersTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete, br
   </div>
 );
 
-export default UsersTable;
+export default BranchTable;

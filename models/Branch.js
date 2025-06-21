@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
-const CustomerSchema = new mongoose.Schema({
-  name: { type: String, required: true, default: "Customer" },
+const BranchSchema = new mongoose.Schema({
+  name: { type: String, required: true, default: "Branch" },
   email: {
     type: String,
     required: true,
@@ -10,9 +10,7 @@ const CustomerSchema = new mongoose.Schema({
   gst: { type: String },
   mobileNo: { type: String, required: true },
   region: { type: String, required: true },
-  branch: { type: String, required: true },
-  type: { type: String, required: true, default: "CUSTOMER" },
 });
 
 // Prevents redefining the model during hot reloading
-export default mongoose.models?.Customer || mongoose.model("Customer", CustomerSchema);
+export default mongoose.models?.Branch || mongoose.model("Branch", BranchSchema);

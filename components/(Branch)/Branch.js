@@ -1,38 +1,28 @@
 "use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import UsersHeader from "./UsersHeader";
-import UsersTable from "./UsersTable";
-import PaginationCard from "../(List)/PaginationCard";
-import UserForm from "./UserForm";
-import styles from "./Users.module.css";
+import BranchHeader from "./BranchHeader";
+import BranchTable from "./BranchTable";
+import PaginationCard from "./PaginationCard";
+import BranchForm from "./BranchForm";
+import styles from "./Branch.module.css";
 
 const PAGE_SIZE = 20;
 
-const Users = () => {
+const Branch = () => {
   const [data, setData] = useState([]);
-  const [branches, setBranches] = useState([]);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editUser, setEditUser] = useState(null);
+  const [editBranch, setEditBranch] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
   const fetchData = useCallback(async () => {
-    const res = await fetch("/api/users");
-    if (res.ok) {
-      const json = await res.json();
-      // Ensure data is always an array
-      setData(Array.isArray(json) ? json : json?.users || []);
-    }
-  }, []);
-
-  const fetchBranch = useCallback(async () => {
     const res = await fetch("/api/branch");
     if (res.ok) {
       const json = await res.json();
-      // Ensure branch data is always an array
-      setBranches(Array.isArray(json) ? json : json?.branches || []);
+      // Ensure data is always an array
+      setData(Array.isArray(json) ? json : json?.branch || []);
     }
   }, []);
 
@@ -40,21 +30,15 @@ const Users = () => {
     fetchData();
   }, [fetchData]);
 
-  useEffect(() => {
-    fetchBranch();
-  }, [fetchBranch]);
-
   const filtered = useMemo(
     () =>
       Array.isArray(data)
         ? data.filter(
-            (user) =>
-              (!type || user.type === type) &&
+            (branch) =>
+              (!type || branch.type === type) &&
               (!search ||
-                `${user.fName || ""} ${user.eName || ""}`
-                  .toLowerCase()
-                  .includes(search.toLowerCase()) ||
-                user.email?.toLowerCase().includes(search.toLowerCase()))
+                branch.name?.toLowerCase().includes(search.toLowerCase()) ||
+                branch.email?.toLowerCase().includes(search.toLowerCase()))
           )
         : [],
     [data, type, search]
@@ -74,62 +58,61 @@ const Users = () => {
   for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
 
   const handleAdd = () => {
-    setEditUser(null);
+    setEditBranch(null);
     setModalOpen(true);
   };
   const handleEdit = () => {
-    const user = data.find((u) => (u._id || data.indexOf(u)) === selectedId);
-    setEditUser(user);
+    const branch = data.find((u) => (u._id || data.indexOf(u)) === selectedId);
+    setEditBranch(branch);
     setModalOpen(true);
   };
   const handleDelete = async () => {
-    const user = data.find((u) => (u._id || data.indexOf(u)) === selectedId);
-    if (!user) return;
-    if (!window.confirm("Delete this user?")) return;
-    await fetch("/api/users", {
+    const branch = data.find((u) => (u._id || data.indexOf(u)) === selectedId);
+    if (!branch) return;
+    if (!window.confirm("Delete this branch?")) return;
+    await fetch("/api/branch", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ _id: user._id }),
+      body: JSON.stringify({ _id: branch._id }),
     });
     setSelectedId(null);
     fetchData();
   };
-  const handleSave = async (user) => {
-    if (editUser && editUser._id) {
-      await fetch("/api/users", {
+  const handleSave = async (branch) => {
+    if (editBranch && editBranch._id) {
+      await fetch("/api/branch", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...user, _id: editUser._id }),
+        body: JSON.stringify({ ...branch, _id: editBranch._id }),
       });
     } else {
-      await fetch("/api/users", {
+      await fetch("/api/branch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(user),
+        body: JSON.stringify(branch),
       });
     }
     setModalOpen(false);
-    setEditUser(null);
+    setEditBranch(null);
     setSelectedId(null);
     fetchData();
   };
 
   return (
     <div className={styles.container}>
-      <UsersHeader
+      <BranchHeader
         type={type}
         setType={setType}
         search={search}
         setSearch={setSearch}
         onAdd={handleAdd}
       />
-      <UsersTable
+      <BranchTable
         paginated={paginated}
         selectedId={selectedId}
         setSelectedId={setSelectedId}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        branches={branches}
       />
       <PaginationCard
         paginated={paginated}
@@ -141,18 +124,17 @@ const Users = () => {
         pageNumbers={pageNumbers}
         totalPages={totalPages}
       />
-      <UserForm
+      <BranchForm
         open={modalOpen}
         onClose={() => {
           setModalOpen(false);
-          setEditUser(null);
+          setEditBranch(null);
         }}
         onSave={handleSave}
-        initial={editUser}
-        branches={branches}
+        initial={editBranch}
       />
     </div>
   );
 };
 
-export default Users;
+export default Branch;

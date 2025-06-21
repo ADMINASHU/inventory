@@ -3,6 +3,7 @@ import connectToServiceEaseDB from "@/lib/serviceDB";
 import { Transaction } from "@/models/Transaction";
 import User from "@/models/User";
 import Customer from "@/models/Customer";
+import Branch from "@/models/Branch";
 
 // Helper to parse JSON body for PUT/DELETE
 async function parseBody(request) {
@@ -62,8 +63,15 @@ export async function POST(request) {
   const body = await request.json();
   try {
     // --- Server-side transactionId generation ---
-    // You may need to adjust this if your branch field is named differently
-    const branchName = body.branch || "";
+    // If branch is an _id, fetch the branch name from the Branch model
+    let branchName = body.branch || "";
+    if (branchName && branchName.length === 24) { // likely a MongoDB ObjectId
+        const branchDoc = await Branch.findById(branchName);
+        if (branchDoc && branchDoc.name) {
+          branchName = branchDoc.name;
+        }
+     
+    }
     const date = body.date ? body.date.slice(0, 10) : ""; // "YYYY-MM-DD"
     if (!branchName || !date) {
       return NextResponse.json({ error: "branch and date are required" }, { status: 400 });

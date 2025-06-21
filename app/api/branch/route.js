@@ -1,50 +1,78 @@
-import axios from "axios";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import connectToServiceEaseDB from '@/lib/serviceDB';
+import Branch from '@/models/Branch';
 
-export async function POST(request) {
+// Helper to parse JSON body for PUT/DELETE
+async function parseBody(request) {
   try {
-    const { regionPayload, cookies } = await request.json();
-    // console.log(cookies);
-
-    if (!cookies) {
-      throw new Error("Cookies not found in context");
-    }
-
-    const response = await axios.post(
-      "http://serviceease.techser.com/live/index.php/masters/branchOnRegion",
-      regionPayload,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          Accept: "*/*",
-          Connection: "keep-alive",
-          Referer: "http://serviceease.techser.com/live/index.php/masters/customers",
-          "X-Requested-With": "XMLHttpRequest",
-          Cookie: cookies,
-        },
-      }
-    );
-
-    return new Response(
-      JSON.stringify({
-        message: "Branch data fetched and stored in context",
-        branchResponse: response.data,
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  } catch (error) {
-
-    //console.error("Error during POST request:", error.message);
-
-    return NextResponse.json({ error: "Error fetching Branch data" }, { status: 500 });
+    return await request.json();
+  } catch {
+    return {};
   }
 }
 
-export async function GET() {
-  return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
+export async function GET(request) {
+  await connectToServiceEaseDB();
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  try {
+    if (id) {
+      const branch = await Branch.findById(id);
+      if (!branch) {
+        return NextResponse.json({ error: 'Branch not found' }, { status: 404 });
+      }
+      return NextResponse.json(branch);
+    }
+    const branches = await Branch.find({});
+    return NextResponse.json(branches);
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
+export async function POST(request) {
+  await connectToServiceEaseDB();
+  try {
+    const body = await request.json();
+    const branch = await Branch.create(body);
+    return NextResponse.json(branch, { status: 201 });
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
+  }
+}
+
+export async function PUT(request) {
+  await connectToServiceEaseDB();
+  const body = await parseBody(request);
+  const { _id, ...update } = body;
+  if (!_id) {
+    return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+  }
+  try {
+    const updated = await Branch.findByIdAndUpdate(_id, update, { new: true });
+    if (!updated) {
+      return NextResponse.json({ error: 'Branch not found' }, { status: 404 });
+    }
+    return NextResponse.json(updated);
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
+  }
+}
+
+export async function DELETE(request) {
+  await connectToServiceEaseDB();
+  const body = await parseBody(request);
+  const { _id } = body;
+  if (!_id) {
+    return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+  }
+  try {
+    const deleted = await Branch.findByIdAndDelete(_id);
+    if (!deleted) {
+      return NextResponse.json({ error: 'Branch not found' }, { status: 404 });
+    }
+    return NextResponse.json({});
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
+  }
 }

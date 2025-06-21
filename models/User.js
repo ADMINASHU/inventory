@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { boolean } from "zod";
 
 const UserSchema = new mongoose.Schema({
 
@@ -26,8 +27,8 @@ const UserSchema = new mongoose.Schema({
   eName: { type: String },
   image: { type: String, required: true, default: "user.png" },
   address: { type: String },
-  region: { type: String },
-  branch: { type: String },
+  inBranch: { type: Boolean, required: true, default: false },
+  branch: { type: mongoose.Schema.Types.ObjectId, ref: "Branch" },
   type: { type: String , required: true, default: "USER", enum: ["USER", "STORE"] },
   mobileNo: { type: String },
   resetToken: { type: String },
