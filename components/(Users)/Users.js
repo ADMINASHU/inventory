@@ -12,7 +12,9 @@ const Users = () => {
   const [data, setData] = useState([]);
   const [branches, setBranches] = useState([]);
   const [search, setSearch] = useState("");
-  const [type, setType] = useState("");
+  const [branchFilter, setBranchFilter] = useState("");
+  const [regionFilter, setRegionFilter] = useState("");
+  const [inBranch, setInBranch] = useState(false);
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
@@ -49,7 +51,8 @@ const Users = () => {
       Array.isArray(data)
         ? data.filter(
             (user) =>
-              (!type || user.type === type) &&
+              (!branchFilter || user.branch === branchFilter) &&
+              (!regionFilter || user.region === regionFilter) &&
               (!search ||
                 `${user.fName || ""} ${user.eName || ""}`
                   .toLowerCase()
@@ -57,7 +60,7 @@ const Users = () => {
                 user.email?.toLowerCase().includes(search.toLowerCase()))
           )
         : [],
-    [data, type, search]
+    [data, branchFilter, regionFilter, search]
   );
   const total = filtered.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -117,11 +120,14 @@ const Users = () => {
   return (
     <div className={styles.container}>
       <UsersHeader
-        type={type}
-        setType={setType}
         search={search}
         setSearch={setSearch}
         onAdd={handleAdd}
+        branchFilter={branchFilter}
+        setBranchFilter={setBranchFilter}
+        regionFilter={regionFilter}
+        setRegionFilter={setRegionFilter}
+        branches={branches}
       />
       <UsersTable
         paginated={paginated}

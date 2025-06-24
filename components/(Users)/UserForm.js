@@ -10,7 +10,7 @@ const UserForm = ({ open, onClose, onSave, initial, branches = [] }) => {
   const [address, setAddress] = useState('');
   const [branch, setBranch] = useState("");
   const [region, setRegion] = useState('');
-  const [type, setType] = useState('STORE');
+
   const [verified, setVerified] = useState(false);
   const [isSecure, setIsSecure] = useState(null);
   const [inBranch, setInBranch] = useState(false);
@@ -25,7 +25,7 @@ const UserForm = ({ open, onClose, onSave, initial, branches = [] }) => {
       setAddress(initial?.address || '');
       setBranch(initial?.branch || '');
       setRegion(initial?.region || '');
-      setType(initial?.type || 'STORE');
+      setInBranch(initial?.inBranch || false);
       setVerified(initial?.verified || false);
       setIsSecure(initial?.isSecure || null);
     }
@@ -64,10 +64,13 @@ const UserForm = ({ open, onClose, onSave, initial, branches = [] }) => {
           </select>
           {/* Display region as readonly text, not as an input */}
           <input className={styles.input} placeholder="Region" value={region} readOnly disabled />
-          <input className={styles.input} placeholder="Type" value={type} onChange={e => setType(e.target.value)} />
           <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <input type="checkbox" checked={verified} onChange={e => setVerified(e.target.checked)} />
             Verified
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input type="checkbox" checked={inBranch} onChange={e => setInBranch(e.target.checked)} />
+            User In Branch
           </label>
           <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <input type="checkbox" checked={isSecure} onChange={e => setIsSecure(e.target.checked)} />
@@ -84,7 +87,7 @@ const UserForm = ({ open, onClose, onSave, initial, branches = [] }) => {
               mobileNo,
               address,
               branch,
-              type,
+              inBranch,
               verified,
               isSecure
             });

@@ -6,19 +6,39 @@ const getUserName = (id, users) => {
   const user = users?.find((u) => u._id === id);
   return user ? user.fName : id;
 };
-const getUserAddress = (id, users) => {
+const getBranchAddress = (id, branches) => {
+  const branch = branches?.find((b) => b._id === id);
+  return branch ? branch.address : id;
+};
+// Update getUserAddress to support inBranch logic
+const getUserAddress = (id, users, branches) => {
+    console.log("branches",branches);
   const user = users?.find((u) => u._id === id);
-  return user ? user.address : "";
+  if (!user) return "";
+  if (user.inBranch && user.branch && branches ) {
+    const branch = getBranchAddress(user.branch, branches);
+    return branch ? branch : "";
+  }
+  return user.address;
 };
 const getUserContact = (id, users) => {
   const user = users?.find((u) => u._id === id);
   return user ? user.mobileNo : "";
 };
 
+const getAreaOfficeAddress = (id, users, branches) => {
+  const user = users?.find((u) => u._id === id);
+  if (!user) return "";
+  if ( user.branch && branches) {
+    const branch = getBranchAddress(user.branch, branches);
+    return branch ? branch : "";
+  }
+};
+
 // Make entry values a little bold and colored
 const entryStyle = { color: "rgb(120,120,120)", fontWeight: 500 };
 
-const Doc = ({ txn = {}, users = [] }) => (
+const Doc = ({ txn = {}, users = [], branches = [] }) => (
   <div className={styles.docWrapper}>
     <div className={styles.title}>DELIVERY CHALLAN</div>
     <div className={styles.headerRow}>
@@ -38,7 +58,7 @@ const Doc = ({ txn = {}, users = [] }) => (
     <div className={styles.companyName}>TECHSER POWER SOLUTIONS PVT. LTD.</div>
     <div className={styles.officeInfo}>
       <span className={styles.bold}>Area Office:</span>
-      {getUserAddress(txn.from, users)}
+      {getAreaOfficeAddress(txn.from, users, branches)}
       {getUserContact(txn.from, users) ? `, Ph. No.: ${getUserContact(txn.from, users)}` : ""}
       <br />
     </div>
@@ -55,7 +75,7 @@ const Doc = ({ txn = {}, users = [] }) => (
               M/s. <span style={entryStyle}>{getUserName(txn.to, users)}</span>
               , <br />
               <span style={entryStyle}>
-                {getUserAddress(txn.to, users)}
+                {getUserAddress(txn.to, users, branches)}
                 {getUserContact(txn.to, users) ? (
                   <>
                     , <br />

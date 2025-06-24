@@ -15,6 +15,7 @@ const Transaction = ({ loggedUser }) => {
   const [parts, setParts] = useState([]);
   const [users, setUsers] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [branches, setBranches] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [page, setPage] = useState(1);
@@ -48,6 +49,10 @@ const Transaction = ({ loggedUser }) => {
     const res = await fetch("/api/users");
     if (res.ok) setUsers(await res.json());
   }, []);
+  const fetchBranches = useCallback(async () => {
+    const res = await fetch("/api/branch");
+    if (res.ok) setBranches(await res.json());
+  }, []);
 
   const fetchCustomers = useCallback(async () => {
     const res = await fetch("/api/customers");
@@ -65,6 +70,10 @@ const Transaction = ({ loggedUser }) => {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  useEffect(() => {
+    fetchBranches();
+  }, [fetchBranches]);
 
   useEffect(() => {
     fetchCustomers();
@@ -151,7 +160,7 @@ const Transaction = ({ loggedUser }) => {
     setSelectedId(null);
     fetchData();
   };
-
+ 
   return (
     <div className={styles.container}>
       <TransactionHeader
@@ -170,6 +179,7 @@ const Transaction = ({ loggedUser }) => {
         onReceive={handleReceive}
         loggedUser={loggedUser}
         users={users}
+        branches={branches}
         customers={customers}
         parts={parts}
       />

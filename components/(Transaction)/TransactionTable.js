@@ -13,15 +13,19 @@ const TransactionTable = ({
   onReceive,
   loggedUser,
   users = [],
+  branches = [],
   customers = [],
   parts = [],
 }) => {
+
+  
   // Helper to get user's fName by id
   const getUserName = (id) => {
     const user = users.find((u) => u._id === id);
     const customer = customers.find((c) => c._id === id);
     return user ? user.fName : customer ? customer.name : id;
   };
+
 
   const getItemName = (id) => {
     const item = parts.find((i) => i._id === id);
@@ -110,7 +114,7 @@ const TransactionTable = ({
               Challan Preview
             </div>
             <div ref={challanRef}>
-              <Doc txn={challanTxn} users={users} />
+              <Doc txn={challanTxn} users={users} branches={branches} />
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
               <button className={styles.addBtn} onClick={handleDownloadPDF} disabled={printing}>

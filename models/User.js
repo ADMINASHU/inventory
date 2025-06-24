@@ -29,7 +29,6 @@ const UserSchema = new mongoose.Schema({
   address: { type: String },
   inBranch: { type: Boolean, required: true, default: false },
   branch: { type: mongoose.Schema.Types.ObjectId, ref: "Branch" },
-  type: { type: String , required: true, default: "USER", enum: ["USER", "STORE"] },
   mobileNo: { type: String },
   resetToken: { type: String },
   resetTokenExpiry: { type: Date },
