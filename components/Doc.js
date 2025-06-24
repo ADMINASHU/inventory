@@ -8,11 +8,14 @@ const getUserName = (id, users) => {
 };
 const getBranchAddress = (id, branches) => {
   const branch = branches?.find((b) => b._id === id);
-  return branch ? branch.address : id;
+  return branch ? branch.address : "";
+};
+const getBranchGST = (id, branches) => {
+  const branch = branches?.find((b) => b._id === id);
+  return branch ? branch.gst : "";
 };
 // Update getUserAddress to support inBranch logic
 const getUserAddress = (id, users, branches) => {
-    console.log("branches",branches);
   const user = users?.find((u) => u._id === id);
   if (!user) return "";
   if (user.inBranch && user.branch && branches ) {
@@ -30,8 +33,16 @@ const getAreaOfficeAddress = (id, users, branches) => {
   const user = users?.find((u) => u._id === id);
   if (!user) return "";
   if ( user.branch && branches) {
-    const branch = getBranchAddress(user.branch, branches);
-    return branch ? branch : "";
+    const address = getBranchAddress(user.branch, branches);
+    return address ? address : "";
+  }
+};
+const getAreaOfficeGST = (id, users, branches) => {
+  const user = users?.find((u) => u._id === id);
+  if (!user) return "";
+  if ( user.branch && branches) {
+    const gst = getBranchGST(user.branch, branches);
+    return gst ? gst : "";
   }
 };
 
@@ -43,7 +54,7 @@ const Doc = ({ txn = {}, users = [], branches = [] }) => (
     <div className={styles.title}>DELIVERY CHALLAN</div>
     <div className={styles.headerRow}>
       <div>
-        <span className={styles.bold}>GSTIN/UIN: 10AABCT0359D</span>
+        <span className={styles.bold}>GSTIN/UIN: {getAreaOfficeGST(txn.from, users, branches)}</span>
       </div>
       <div>
         <div>
