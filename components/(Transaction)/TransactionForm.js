@@ -86,13 +86,13 @@ const TransactionForm = ({
 
   // Dynamically get categories for each item row (in case parts list changes)
   const getCategories = useMemo(
-    () => Array.from(new Set(parts.map((p) => p.category).filter(Boolean))),
-    [parts]
+    () => transactionType === "RECEIVED" ? Array.from(new Set(parts.map((p) => p.category).filter(Boolean))) : Array.from((new Set(stock.map((s) => s.category).filter(Boolean)))) ,
+    [parts, stock, transactionType]
   );
 
   // Helper to get part names for a category
   const getPartNamesByCategory = (category) =>
-    parts.filter((p) => p.category === category).map((p) => p.partName);
+    transactionType === "RECEIVED" ? parts.filter((p) => p.category === category).map((p) => p.partName) : stock.filter((s) => s.category === category).map((s) => s.partName);
 
   // Helper to get partId by category and partName
   const getPartId = (category, partName) => {
@@ -429,13 +429,14 @@ const TransactionForm = ({
                   <input
                     className={styles.input}
                     type="number"
-                    min={0}
+                    min={1}
                     value={item.count ?? 0}
                     disabled={!item.partName}
                     onChange={(e) =>
                       handleItemChange(idx, "count", Number(e.target.value))
                     }
                     required
+                    max={transactionType === "SEND" ? getAvailableStock(item._id) : undefined}
                   />
                   <div style={{ display: "flex", gap: 4 }}>
                     {items.length > 1 && (
@@ -451,16 +452,26 @@ const TransactionForm = ({
                   </div>
                 </div>
               ))}
-              {items.map((item, idx) => (
-                // Show available stock only if partName is selected and count is not yet entered
-                // (i.e., item.count is empty, null, or zero string, but not a valid number > 0)
-                // Hide after count is entered (i.e., item.count is a valid number > 0)
-                item.category && item.partName && (item.count === 0 || item.count === null || item.count === undefined || item.count > getAvailableStock(item._id))  && (
-                  <div key={idx} className={styles.availableStockRow} style={{ color: "#888", fontSize: "0.95em", marginBottom: 4, marginLeft: 2 }}>
-                    Available stock: {getAvailableStock(item._id)}
-                  </div>
-                )
-              ))}
+              {items.map((item, idx) => {
+                const available = getAvailableStock(item._id);
+                const isOver = item.category && item.partName && Number(item.count) > available;
+                return (
+                  item.category && item.partName && (item.count === null || item.count > 0) && (
+                    <div
+                      key={idx}
+                      className={styles.availableStockRow}
+                      style={{
+                        color: isOver ? "red" : "#888",
+                        fontSize: "0.95em",
+                        marginBottom: 4,
+                        marginLeft: 2,
+                      }}
+                    >
+                      Available stock: {available}
+                    </div>
+                  )
+                );
+              })}
             </div>
           </div>
 

@@ -44,7 +44,8 @@ export async function GET(req) {
       idCountMap[id].description = list ? list.description : "Unknown Description";
     });
 
-    const result = Object.values(idCountMap);
+    // Only include items with count !== 0
+    const result = Object.values(idCountMap).filter(item => item.count !== 0);
 
     return NextResponse.json(result);
   }

@@ -17,15 +17,12 @@ const TransactionTable = ({
   customers = [],
   parts = [],
 }) => {
-
-  
   // Helper to get user's fName by id
   const getUserName = (id) => {
     const user = users.find((u) => u._id === id);
     const customer = customers.find((c) => c._id === id);
     return user ? user.fName : customer ? customer.name : id;
   };
-
 
   const getItemName = (id) => {
     const item = parts.find((i) => i._id === id);
@@ -189,7 +186,8 @@ const TransactionTable = ({
                         <li key={i}>
                           <span>
                             <>
-                              {getItemName(item._id)}{" "} : <span className={styles.itemCount}>{item.count}</span>
+                              {getItemName(item._id)} :{" "}
+                              <span className={styles.itemCount}>{item.count}</span>
                               <br />(<span>{getItemCategory(item._id)}</span>)
                             </>
                           </span>
@@ -220,17 +218,6 @@ const TransactionTable = ({
                       >
                         🗑️
                       </button>
-                      <button
-                        className={styles.iconBtn}
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setChallanTxn(txn);
-                        }}
-                        title="Create Challan"
-                      >
-                        📄
-                      </button>
                     </div>
                   ) : txn.transactionStatus === "IN PROCESS" ? (
                     <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
@@ -248,6 +235,19 @@ const TransactionTable = ({
                   ) : (
                     <div style={{ display: "flex", gap: "6px", alignItems: "center" }}> </div>
                   )}
+                  <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                    <button
+                      className={styles.iconBtn}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setChallanTxn(txn);
+                      }}
+                      title="Create Challan"
+                    >
+                      📄
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))
