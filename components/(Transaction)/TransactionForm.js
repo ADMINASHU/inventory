@@ -84,15 +84,7 @@ const TransactionForm = ({
   const [approvedAt, setApprovedAt] = useState("");
   const [updateHistory, setUpdateHistory] = useState([]);
 
-  // Dynamically get categories for each item row (in case parts list changes)
-  const getCategories = useMemo(
-    () => transactionType === "RECEIVED" ? Array.from(new Set(parts.map((p) => p.category).filter(Boolean))) : Array.from((new Set(stock.map((s) => s.category).filter(Boolean)))) ,
-    [parts, stock, transactionType]
-  );
 
-  // Helper to get part names for a category
-  const getPartNamesByCategory = (category) =>
-    transactionType === "RECEIVED" ? parts.filter((p) => p.category === category).map((p) => p.partName) : stock.filter((s) => s.category === category).map((s) => s.partName);
 
   // Helper to get partId by category and partName
   const getPartId = (category, partName) => {

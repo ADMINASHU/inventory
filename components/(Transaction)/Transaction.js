@@ -6,7 +6,6 @@ import PaginationCard from "./PaginationCard";
 import TransactionForm from "./TransactionForm";
 import styles from "./Transaction.module.css";
 
-
 const PAGE_SIZE = 20;
 
 const Transaction = ({ loggedUser }) => {
@@ -16,7 +15,14 @@ const Transaction = ({ loggedUser }) => {
   const [users, setUsers] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [branches, setBranches] = useState([]);
-  const [search, setSearch] = useState("");
+  const now = new Date();
+  const [searchObj, setSearchObj] = useState({
+    year: now.getFullYear().toString(),
+    user: "",
+    type: "",
+    month: now.toLocaleString("default", { month: "long" }),
+    search: "",
+  });
   const [category, setCategory] = useState("");
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
@@ -31,14 +37,12 @@ const Transaction = ({ loggedUser }) => {
     if (res.ok) setData(await res.json());
   }, []);
 
-
-   useEffect(() => {
-      if (!loggedUser?.sub) return;
-      fetch(`/api/stock?stock=${loggedUser.sub}`)
-        .then((res) => (res.ok ? res.json() : []))
-        .then(setStock);
-    }, [loggedUser?.sub]);
-
+  useEffect(() => {
+    if (!loggedUser?.sub) return;
+    fetch(`/api/stock?stock=${loggedUser.sub}`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then(setStock);
+  }, [loggedUser?.sub]);
 
   const fetchParts = useCallback(async () => {
     const res = await fetch("/api/list");
@@ -81,12 +85,23 @@ const Transaction = ({ loggedUser }) => {
 
   const filtered = useMemo(
     () =>
-      data.filter(
-        (item) =>
-          (!category || item.category === category) &&
-          (!search || item.partName.toLowerCase().includes(search.toLowerCase()))
+      data.filter((item) =>
+        (!category || item.category === category) &&
+        (!searchObj.search || (item.partName || "").toLowerCase().includes(searchObj.search.toLowerCase())) &&
+        (!searchObj.year || (item.date && new Date(item.date).getFullYear().toString() === searchObj.year)) &&
+        (!searchObj.month ||
+          (item.date &&
+            new Date(item.date).toLocaleString("default", { month: "long" }) === searchObj.month)
+        ) &&
+        (!searchObj.type || item.transactionType === searchObj.type) &&
+        (
+          !searchObj.user ||
+          (searchObj.type === "SEND"
+            ? item.to === searchObj.user
+            : item.from === searchObj.user)
+        )
       ),
-    [data, category, search]
+    [data, category, searchObj]
   );
   const total = filtered.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -146,7 +161,7 @@ const Transaction = ({ loggedUser }) => {
       await fetch("/api/transaction", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...obj, _id: editItem._id}),
+        body: JSON.stringify({ ...obj, _id: editItem._id }),
       });
     } else {
       await fetch("/api/transaction", {
@@ -160,16 +175,17 @@ const Transaction = ({ loggedUser }) => {
     setSelectedId(null);
     fetchData();
   };
- 
+
   return (
     <div className={styles.container}>
       <TransactionHeader
         category={category}
         setCategory={setCategory}
-        search={search}
-        setSearch={setSearch}
+        searchObj={searchObj}
+        setSearchObj={setSearchObj}
         onAdd={handleAdd}
         data={data}
+        users={users}
       />
       <TransactionTable
         paginated={paginated}

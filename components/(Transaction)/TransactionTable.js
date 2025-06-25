@@ -169,8 +169,8 @@ const TransactionTable = ({
                       ? "SEND"
                       : "SEND*"
                     : txn.createdBy === loggedUser?.sub
-                    ? "RECEIVE*"
-                    : "RECEIVE"}
+                    ? "RECEIVE"
+                    : "RECEIVE*"}
                 </td>
                 <td className={styles.td}>
                   {getUserName(txn.from === loggedUser?.sub ? txn.to : txn.from)}

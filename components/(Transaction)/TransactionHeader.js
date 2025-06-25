@@ -1,23 +1,46 @@
 import React from "react";
 import styles from "./Transaction.module.css";
 
-const TransactionHeader = ({ search, setSearch, onAdd, data = [] }) => {
+const TransactionHeader = ({ searchObj, setSearchObj, onAdd, data = [], users = [] }) => {
 
-  console.log(data);
-  const userOptions = Array.from(new Set(data.map((item) => item.to)));
+  const { year, user, type, month, search } = searchObj;
+
+  // Update searchObj state
+  const setSearch = (key, value) => {
+    setSearchObj((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // Extract month and year from item.date
+  const monthOptions = Array.from(
+    new Set(
+      data
+        .map((item) =>
+          item.date ? new Date(item.date).toLocaleString("default", { month: "long" }) : null
+        )
+        .filter(Boolean)
+    )
+  );
+  const yearOptions = Array.from(
+    new Set(
+      data.map((item) => (item.date ? new Date(item.date).getFullYear() : null)).filter(Boolean)
+    )
+  );
+
+  // Helper to get user name by id
+  const getUserName = (id) => {
+    const user = users.find((u) => u._id === id);
+    return user ? `${user?.fName} ${user?.eName}`.trim() || id : id;
+  };
+
+  // User options as unique user ids from data
+  const userIds = Array.from(new Set(data.map((item) => item.to && item.from).filter(Boolean)));
+  const userSelectOptions = userIds.map((userId) => (
+    <option key={userId} value={userId}>
+      {getUserName(userId)}
+    </option>
+  ));
+
   const transactionTypeOptions = Array.from(new Set(data.map((item) => item.transactionType)));
-  const monthOptions = Array.from(new Set(data.map((item) => item.month)));
-  const yearOptions = Array.from(new Set(data.map((item) => item.year)));
-  const userSelectOptions = userOptions.map((user) => (
-    <option key={user} value={user}>
-      {user}
-    </option>
-  ));
-  const transactionTypeSelectOptions = transactionTypeOptions.map((type) => (
-    <option key={type} value={type}>
-      {type}
-    </option>
-  ));
   const monthSelectOptions = monthOptions.map((month) => (
     <option key={month} value={month}>
       {month}
@@ -28,25 +51,31 @@ const TransactionHeader = ({ search, setSearch, onAdd, data = [] }) => {
       {year}
     </option>
   ));
+  const transactionTypeSelectOptions = transactionTypeOptions.map((type) => (
+    <option key={type} value={type}>
+      {type}
+    </option>
+  ));
+
   return (
     <div className={styles.card}>
       <div className={styles.header}>
         <div className={styles.filters}>
           {/* add here select inputs for user, transactionType, Month, Year */}
-          <select className={styles.select}>
+          <select className={styles.select} value={year} onChange={(e) => setSearch("year", e.target.value)}>
             <option value="">All Years</option>
             {yearSelectOptions}
           </select>
-          <select className={styles.select}>
+          <select className={styles.select} value={month} onChange={(e) => setSearch("month", e.target.value)}>
             <option value="">All Months</option>
             {monthSelectOptions}
           </select>
 
-          <select className={styles.select}>
+          <select className={styles.select} value={type} onChange={(e) => setSearch("type", e.target.value)}>
             <option value="">All Transaction Types</option>
             {transactionTypeSelectOptions}
           </select>
-          <select className={styles.select}>
+          <select className={styles.select} value={user} onChange={(e) => setSearch("user", e.target.value)}>
             <option value="">All Users</option>
             {userSelectOptions}
           </select>
@@ -55,7 +84,7 @@ const TransactionHeader = ({ search, setSearch, onAdd, data = [] }) => {
             type="text"
             placeholder="Search part name..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => setSearch("search", e.target.value)}
             className={styles.input}
           />
         </div>
