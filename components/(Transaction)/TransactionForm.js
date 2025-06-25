@@ -390,88 +390,84 @@ const TransactionForm = ({
                 <span style={{ minWidth: 60 }}></span>
               </div>
               {items.map((item, idx) => (
-                <div key={idx} className={styles.itemListRow}>
-                  {/* Dynamic Category dropdown */}
-                  <select
-                    className={styles.input}
-                    value={item.category || ""}
-                    onChange={(e) =>
-                      handleItemChange(idx, "category", e.target.value)
-                    }
-                    required
-                  >
-                    <option value="">Select Category</option>
-                    {getCategories.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                  {/* Part Name dropdown */}
-                  <select
-                    className={styles.input}
-                    value={item.partName || ""}
-                    onChange={(e) =>
-                      handleItemChange(idx, "partName", e.target.value)
-                    }
-                    required
-                    disabled={!item.category}
-                  >
-                    <option value="">Select Part Name</option>
-                    {item.category &&
-                      getPartNamesByCategory(item.category).map((name) => (
-                        <option key={name} value={name}>
-                          {name}
+                <React.Fragment key={idx}>
+                  <div className={styles.itemListRow}>
+                    {/* Dynamic Category dropdown */}
+                    <select
+                      className={styles.input}
+                      value={item.category || ""}
+                      onChange={(e) =>
+                        handleItemChange(idx, "category", e.target.value)
+                      }
+                      required
+                    >
+                      <option value="">Select Category</option>
+                      {getCategories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
                         </option>
                       ))}
-                  </select>
-                  {/* Count */}
-                  <input
-                    className={styles.input}
-                    type="number"
-                    min={1}
-                    value={item.count ?? 0}
-                    disabled={!item.partName}
-                    onChange={(e) =>
-                      handleItemChange(idx, "count", Number(e.target.value))
-                    }
-                    required
-                    max={transactionType === "SEND" ? getAvailableStock(item._id) : undefined}
-                  />
-                  <div style={{ display: "flex", gap: 4 }}>
-                    {items.length > 1 && (
-                      <button
-                        className={styles.iconBtn}
-                        type="button"
-                        onClick={() => handleRemoveItem(idx)}
-                        title="Remove item"
-                      >
-                        &minus;
-                      </button>
-                    )}
+                    </select>
+                    {/* Part Name dropdown */}
+                    <select
+                      className={styles.input}
+                      value={item.partName || ""}
+                      onChange={(e) =>
+                        handleItemChange(idx, "partName", e.target.value)
+                      }
+                      required
+                      disabled={!item.category}
+                    >
+                      <option value="">Select Part Name</option>
+                      {item.category &&
+                        getPartNamesByCategory(item.category).map((name) => (
+                          <option key={name} value={name}>
+                            {name}
+                          </option>
+                        ))}
+                    </select>
+                    {/* Count */}
+                    <input
+                      className={styles.input}
+                      type="number"
+                      min={1}
+                      value={item.count ?? 0}
+                      disabled={!item.partName}
+                      onChange={(e) =>
+                        handleItemChange(idx, "count", Number(e.target.value))
+                      }
+                      required
+                      max={transactionType === "SEND" ? getAvailableStock(item._id) : undefined}
+                    />
+                    <div style={{ display: "flex", gap: 4 }}>
+                      {items.length > 1 && (
+                        <button
+                          className={styles.iconBtn}
+                          type="button"
+                          onClick={() => handleRemoveItem(idx)}
+                          title="Remove item"
+                        >
+                          &minus;
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-              {items.map((item, idx) => {
-                const available = getAvailableStock(item._id);
-                const isOver = item.category && item.partName && Number(item.count) > available;
-                return (
-                  item.category && item.partName && (item.count === null || item.count > 0) && (
+                  {/* Available stock row just below each item */}
+                  {item.category && item.partName && (item.count === null || item.count > 0) && (
                     <div
-                      key={idx}
                       className={styles.availableStockRow}
                       style={{
-                        color: isOver ? "red" : "#888",
+                        color: Number(item.count) > getAvailableStock(item._id) ? "red" : "#888",
                         fontSize: "0.95em",
                         marginBottom: 4,
                         marginLeft: 2,
                       }}
                     >
-                      Available stock: {available}
+                      Available stock: {getAvailableStock(item._id)}
                     </div>
-                  )
-                );
-              })}
+                  )}
+                </React.Fragment>
+              ))}
             </div>
           </div>
 
@@ -582,3 +578,4 @@ const TransactionForm = ({
 };
 
 export default TransactionForm;
+
