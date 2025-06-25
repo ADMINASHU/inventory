@@ -89,6 +89,7 @@ const List = () => {
         search={search}
         setSearch={setSearch}
         onAdd={handleAdd}
+        data={data}
       />
       <ListTable
         paginated={paginated}
@@ -112,6 +113,7 @@ const List = () => {
         onClose={() => { setModalOpen(false); setEditItem(null); }}
         onSave={handleSave}
         initial={editItem}
+        data={data}
       />
     </div>
   );

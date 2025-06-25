@@ -51,6 +51,7 @@ function TransactionTable({ loggedUser }) {
         setCategory={setCategory}
         search={search}
         setSearch={setSearch}
+        data={stock}
       />
       <StockTable paginated={paginated} PAGE_SIZE={PAGE_SIZE} page={page} />
       <PaginationCard

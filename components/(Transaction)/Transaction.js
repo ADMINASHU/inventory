@@ -169,6 +169,7 @@ const Transaction = ({ loggedUser }) => {
         search={search}
         setSearch={setSearch}
         onAdd={handleAdd}
+        data={data}
       />
       <TransactionTable
         paginated={paginated}
