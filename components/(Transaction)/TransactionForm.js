@@ -240,6 +240,47 @@ const TransactionForm = ({
     return part ? part.count : 0;
   };
 
+  // Helper to get selected part ids (excluding current idx)
+  const getSelectedPartIds = (excludeIdx = -1) =>
+    items
+      .map((item, idx) => (idx !== excludeIdx ? item._id : null))
+      .filter(Boolean);
+
+  // Helper to get available categories for each item row
+  const getAvailableCategories = (excludeIdx = -1) => {
+    const selectedIds = getSelectedPartIds(excludeIdx);
+    const source = transactionType === "RECEIVED" ? parts : stock;
+    // Only include categories that have at least one part not already selected
+    return Array.from(
+      new Set(
+        source
+          .filter((p) => !selectedIds.includes(p._id))
+          .map((p) => p.category)
+          .filter(Boolean)
+      )
+    );
+  };
+
+  // Helper to get available part names for a category for each item row
+  const getAvailablePartNamesByCategory = (category, excludeIdx = -1) => {
+    const selectedIds = getSelectedPartIds(excludeIdx);
+    const source = transactionType === "RECEIVED" ? parts : stock;
+    return source
+      .filter(
+        (p) =>
+          p.category === category &&
+          !selectedIds.includes(p._id)
+      )
+      .map((p) => p.partName);
+  };
+
+  // Disable add item button if all items are selected
+  const allSelectableIds = useMemo(() => {
+    const source = transactionType === "RECEIVED" ? parts : stock;
+    return source.map((p) => p._id);
+  }, [transactionType, parts, stock]);
+  const allSelected = items.length >= allSelectableIds.length;
+
   if (!open) return null;
   return (
     <div className={styles.modalOverlay}>
@@ -375,6 +416,7 @@ const TransactionForm = ({
                   type="button"
                   onClick={handleAddItem}
                   title="Add item"
+                  disabled={allSelected}
                 >
                   +
                 </button>
@@ -402,7 +444,7 @@ const TransactionForm = ({
                       required
                     >
                       <option value="">Select Category</option>
-                      {getCategories.map((cat) => (
+                      {getAvailableCategories(idx).map((cat) => (
                         <option key={cat} value={cat}>
                           {cat}
                         </option>
@@ -420,7 +462,7 @@ const TransactionForm = ({
                     >
                       <option value="">Select Part Name</option>
                       {item.category &&
-                        getPartNamesByCategory(item.category).map((name) => (
+                        getAvailablePartNamesByCategory(item.category, idx).map((name) => (
                           <option key={name} value={name}>
                             {name}
                           </option>
