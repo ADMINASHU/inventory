@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, use } from "react";
 import styles from "./Transaction.module.css";
 
 // Floating label input component
@@ -52,13 +52,18 @@ const TransactionForm = ({
   customers = [],
   stock = [],
   loggedUser,
+  from,
+  setFrom,
+  transactionType,
+  setTransactionType,
+
 }) => {
   const [date, setDate] = useState("");
   const [items, setItems] = useState([{ ...emptyItem }]);
   const [total, setTotal] = useState(0);
   const [transactionMethod, setTransactionMethod] = useState("");
-  const [transactionType, setTransactionType] = useState("");
-  const [from, setFrom] = useState("");
+  // const [transactionType, setTransactionType] = useState("");
+  // const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [createdBy, setCreatedBy] = useState("");
   const [note, setNote] = useState("");
@@ -91,6 +96,9 @@ const TransactionForm = ({
       setTo("");
     }
   }, [from, to]);
+
+
+
 
   useEffect(() => {
     if (open && initial) {
@@ -141,7 +149,7 @@ const TransactionForm = ({
       setUpdateHistory([]);
     }
     // transactionType is not a dependency here, so it will not reset when changed by user
-  }, [open, initial, parts, stock, loggedUser]);
+  }, [open, initial, parts, loggedUser]);
 
   useEffect(() => {
     // This effect only runs when transactionType changes (for add mode)
@@ -193,17 +201,8 @@ const TransactionForm = ({
 
   // Helper to get available stock for a part (by _id)
   const getAvailableStock = (partId, idx = -1) => {
-    // Find the part in stock
     const part = stock.find((s) => s._id === partId);
     let available = part ? part.count : 0;
-
-    // If editing an existing transaction, add back the original count for this item
-    // if (initial && initial.items && idx > -1) {
-    //   const initialItem = initial.items[idx];
-    //   if (initialItem && (initialItem._id === partId || initialItem.partId === partId)) {
-    //     available += Number(initialItem.count) || 0;
-    //   }
-    // }
     return available;
   };
 

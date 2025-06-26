@@ -28,6 +28,8 @@ const Transaction = ({ loggedUser }) => {
   // const [receivedOpen, setReceivedOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
+  const [transactionType, setTransactionType] = useState("SEND");
+   const [from, setFrom] = useState("");
 
   const fetchData = useCallback(async () => {
     if (!loggedUser?.branch) return;
@@ -39,10 +41,7 @@ const Transaction = ({ loggedUser }) => {
       pageSize: PAGE_SIZE.toString(),
       year: searchObj.year || "",
       month: searchObj.month || "",
-      type: searchObj.type || "",
-      user: searchObj.user || "",
       search: searchObj.search || "",
-      category: category || "",
     });
     const res = await fetch(`/api/transaction?${params.toString()}`);
     if (res.ok) {
@@ -50,15 +49,20 @@ const Transaction = ({ loggedUser }) => {
       setData(json.items || []);
       setTotal(json.total || 0);
     }
-  }, [loggedUser?.branch, loggedUser?.sub, page, PAGE_SIZE, searchObj, category]);
+  }, [
+    loggedUser?.branch,
+    loggedUser?.sub,
+    page,
+    PAGE_SIZE,
+    searchObj,
+    category,
+  ]);
 
-  useEffect(() => {
-    if (!loggedUser?.sub) return;
-    fetch(`/api/stock?stock=${loggedUser.sub}`)
+  const fetchStock = useCallback(async (id) => {
+    fetch(`/api/stock?stock=${id}`)
       .then((res) => (res.ok ? res.json() : []))
       .then(setStock);
-  }, [loggedUser?.sub]);
-
+  }, []);
   const fetchParts = useCallback(async () => {
     const res = await fetch("/api/list");
     if (res.ok) setParts(await res.json());
@@ -77,6 +81,14 @@ const Transaction = ({ loggedUser }) => {
     const res = await fetch("/api/customers");
     if (res.ok) setCustomers(await res.json());
   }, []);
+
+  useEffect(() => {
+    if (transactionType === "SEND") {
+      fetchStock(loggedUser?.sub);
+    } else if (transactionType === "RECEIVED" && from) {
+      fetchStock(from);
+    }
+  }, [fetchStock, loggedUser?.sub, transactionType, from]);
 
   useEffect(() => {
     fetchData();
@@ -215,10 +227,13 @@ const Transaction = ({ loggedUser }) => {
         customers={customers}
         stock={stock}
         loggedUser={loggedUser}
+        transactionType={transactionType}
+        setTransactionType={setTransactionType}
+        from={from}
+        setFrom={setFrom}
       />
     </div>
   );
 };
 
 export default Transaction;
-
