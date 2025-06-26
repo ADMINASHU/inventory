@@ -18,7 +18,7 @@ const getBranchGST = (id, branches) => {
 const getUserAddress = (id, users, branches) => {
   const user = users?.find((u) => u._id === id);
   if (!user) return "";
-  if (user.inBranch && user.branch && branches ) {
+  if (user.inBranch && user.branch && branches) {
     const branch = getBranchAddress(user.branch, branches);
     return branch ? branch : "";
   }
@@ -32,7 +32,7 @@ const getUserContact = (id, users) => {
 const getAreaOfficeAddress = (id, users, branches) => {
   const user = users?.find((u) => u._id === id);
   if (!user) return "";
-  if ( user.branch && branches) {
+  if (user.branch && branches) {
     const address = getBranchAddress(user.branch, branches);
     return address ? address : "";
   }
@@ -40,7 +40,7 @@ const getAreaOfficeAddress = (id, users, branches) => {
 const getAreaOfficeGST = (id, users, branches) => {
   const user = users?.find((u) => u._id === id);
   if (!user) return "";
-  if ( user.branch && branches) {
+  if (user.branch && branches) {
     const gst = getBranchGST(user.branch, branches);
     return gst ? gst : "";
   }
@@ -49,12 +49,20 @@ const getAreaOfficeGST = (id, users, branches) => {
 // Make entry values a little bold and colored
 const entryStyle = { color: "rgb(120,120,120)", fontWeight: 500 };
 
-const Doc = ({ txn = {}, users = [], branches = [] }) => (
+const Doc = ({
+  txn = {},
+  users = [],
+  branches = [],
+  getItemCategory,
+  getItemName,
+}) => (
   <div className={styles.docWrapper}>
     <div className={styles.title}>DELIVERY CHALLAN</div>
     <div className={styles.headerRow}>
       <div>
-        <span className={styles.bold}>GSTIN/UIN: {getAreaOfficeGST(txn.from, users, branches)}</span>
+        <span className={styles.bold}>
+          GSTIN/UIN: {getAreaOfficeGST(txn.from, users, branches)}
+        </span>
       </div>
       <div>
         <div>
@@ -62,7 +70,9 @@ const Doc = ({ txn = {}, users = [], branches = [] }) => (
         </div>
         <div>
           Dated:{" "}
-          <span style={entryStyle}>{txn.date ? new Date(txn.date).toLocaleDateString() : ""}</span>
+          <span style={entryStyle}>
+            {txn.date ? new Date(txn.date).toLocaleDateString() : ""}
+          </span>
         </div>
       </div>
     </div>
@@ -70,13 +80,15 @@ const Doc = ({ txn = {}, users = [], branches = [] }) => (
     <div className={styles.officeInfo}>
       <span className={styles.bold}>Area Office:</span>
       {getAreaOfficeAddress(txn.from, users, branches)}
-      {getUserContact(txn.from, users) ? `, Ph. No.: ${getUserContact(txn.from, users)}` : ""}
+      {getUserContact(txn.from, users)
+        ? `, Ph. No.: ${getUserContact(txn.from, users)}`
+        : ""}
       <br />
     </div>
     <div className={styles.officeInfo}>
-      <span className={styles.bold}>Head Office:</span> “TECHSER HOUSE” #12/1, 5th Cross, MES Ring
-      Road, Sharadamba Nagar, Jalahalli, Bangalore - 560013, Ph. No.: 080 - 28384854 / 28384517 /
-      23458706
+      <span className={styles.bold}>Head Office:</span> “TECHSER HOUSE” #12/1,
+      5th Cross, MES Ring Road, Sharadamba Nagar, Jalahalli, Bangalore - 560013,
+      Ph. No.: 080 - 28384854 / 28384517 / 23458706
     </div>
     <table className={styles.infoTable}>
       <tbody>
@@ -106,13 +118,15 @@ const Doc = ({ txn = {}, users = [], branches = [] }) => (
               </span>
             </div>
             <div>
-              Order No.: <span style={entryStyle}>{txn.transactionId || ""}</span>
+              Order No.:{" "}
+              <span style={entryStyle}>{txn.transactionId || ""}</span>
             </div>
             <div>
               GSTIN: <span style={entryStyle}></span>
             </div>
             <div>
-              Mode of despatch: <span style={entryStyle}>{txn.transactionMethod || ""}</span>
+              Mode of despatch:{" "}
+              <span style={entryStyle}>{txn.transactionMethod || ""}</span>
             </div>
           </td>
         </tr>
@@ -122,21 +136,23 @@ const Doc = ({ txn = {}, users = [], branches = [] }) => (
       <thead>
         <tr>
           <th className={styles.cell + " " + styles.center + " " + styles.slno}>
-            Sl.
-            <br />
-            No.
+            S.No
           </th>
-          <th className={styles.cell + " " + styles.center + " " + styles.desc}>DESCRIPTION</th>
-          <th className={styles.cell + " " + styles.center + " " + styles.qty}>QTY.</th>
+          <th className={styles.cell + " " + styles.center + " " + styles.desc}>
+            DESCRIPTION
+          </th>
+          <th className={styles.cell + " " + styles.center + " " + styles.qty}>
+            QTY.
+          </th>
           <th className={styles.cell + " " + styles.center + " " + styles.rate}>
             RATE / UNIT
-            <br />
-            Rs.
+         
           </th>
-          <th className={styles.cell + " " + styles.center + " " + styles.amount}>
+          <th
+            className={styles.cell + " " + styles.center + " " + styles.amount}
+          >
             AMOUNT
-            <br />
-            Rs.
+            
           </th>
         </tr>
       </thead>
@@ -144,15 +160,15 @@ const Doc = ({ txn = {}, users = [], branches = [] }) => (
         {txn.items && txn.items.length > 0 ? (
           txn.items.map((item, idx) => (
             <tr key={idx}>
-              <td className={styles.cell}>
+              <td className={styles.cell + " " + styles.center}>
                 <span style={entryStyle}>{idx + 1}</span>
               </td>
               <td className={styles.cell}>
-                <span style={entryStyle}>{item.partName || item._id}</span>
-                {item.category ? <span style={entryStyle}> ({item.category})</span> : ""}
+                <span style={entryStyle}>{getItemName(item._id)}</span>
+                <span style={entryStyle}> ({getItemCategory(item._id)})</span>
               </td>
-              <td className={styles.cell}>
-                <span style={entryStyle}>{item.count}</span>
+              <td className={styles.cell + " " + styles.right}>
+                <span style={entryStyle}>{item.count} Nos</span>
               </td>
               <td className={styles.cell}>
                 <span style={entryStyle}></span>
@@ -182,6 +198,20 @@ const Doc = ({ txn = {}, users = [], branches = [] }) => (
           </tr>
         )}
       </tbody>
+      <tr>
+        <td className={styles.cell} colSpan={2} style={{ textAlign: "right", fontWeight: 600 }}>
+          Total Nos
+        </td>
+        <td className={styles.cell}>
+          <span style={entryStyle}>{txn.total} Nos</span>
+        </td>
+        <td className={styles.cell} colSpan={1} style={{ textAlign: "right", fontWeight: 600 }}>
+          Total Amount
+        </td>
+        <td className={styles.cell}>
+          <span style={entryStyle}></span>
+        </td>
+      </tr>
     </table>
     <div className={styles.footerRow}>
       <div>
@@ -194,7 +224,8 @@ const Doc = ({ txn = {}, users = [], branches = [] }) => (
       </div>
       <div className={styles.footerRight}>
         <span>
-          For <span className={styles.bold}>Techser Power Solutions Pvt. Ltd.</span>
+          For{" "}
+          <span className={styles.bold}>Techser Power Solutions Pvt. Ltd.</span>
           <br />
           <br />
           <span className={styles.footerNote}>Authorised Signatory</span>

@@ -78,6 +78,9 @@
 .center {
   text-align: center;
 }
+.right {
+  text-align: right;
+}
 
 .slno {
   width: 6%;
@@ -101,6 +104,11 @@
 
 .itemsTable thead tr {
   background: #f5f5f5;
+}
+
+.itemsTable tbody tr td {
+  border-top: none;
+  border-bottom: none;
 }
 
 .footerRow {

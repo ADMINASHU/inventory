@@ -21,7 +21,7 @@
     "url": "git+https://github.com/ADMINASHU/inventory.git"
   },
   "license": "ISC",
-  "author": "",
+  "author": "Adminashu",
   "type": "module",
   "main": "index.js",
   "directories": {
