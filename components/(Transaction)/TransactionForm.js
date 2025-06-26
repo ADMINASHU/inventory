@@ -198,12 +198,12 @@ const TransactionForm = ({
     let available = part ? part.count : 0;
 
     // If editing an existing transaction, add back the original count for this item
-    if (initial && initial.items && idx > -1) {
-      const initialItem = initial.items[idx];
-      if (initialItem && (initialItem._id === partId || initialItem.partId === partId)) {
-        available += Number(initialItem.count) || 0;
-      }
-    }
+    // if (initial && initial.items && idx > -1) {
+    //   const initialItem = initial.items[idx];
+    //   if (initialItem && (initialItem._id === partId || initialItem.partId === partId)) {
+    //     available += Number(initialItem.count) || 0;
+    //   }
+    // }
     return available;
   };
 

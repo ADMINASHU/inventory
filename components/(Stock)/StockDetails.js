@@ -106,6 +106,10 @@ const StockDetails = ({ id, loggedUser }) => {
               <span className={styles.detailLabel}>Total Stock:</span>
               <span className={styles.detailValue}>{item.count}</span>
             </div>
+            <div className={styles.detailItem}>
+              <span className={styles.detailLabel}>Stock on the way:</span>
+              <span className={styles.detailValue}>{item.pending}</span>
+            </div>
           </div>
         </div>
         <div className={styles.transactionsSectionModern}>
@@ -124,6 +128,7 @@ const StockDetails = ({ id, loggedUser }) => {
                     <th className={styles.thModern}>Account</th>
                     <th className={styles.thModern}>Method</th>
                     <th className={styles.thModern}>Total</th>
+                    <th className={styles.thModern}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -165,6 +170,7 @@ const StockDetails = ({ id, loggedUser }) => {
                           <td className={styles.tdModern}>{getUserName(account)}</td>
                           <td className={styles.tdModern}>{txn.transactionMethod || ""}</td>
                           <td className={styles.tdModern}>{itemInTxn.count}</td>
+                          <td className={styles.tdModern}>{txn.transactionStatus || ""}</td>
                         </tr>
                       );
                     })}

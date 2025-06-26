@@ -13,7 +13,18 @@ export async function GET(req) {
 
     // Fetch all transactions for this stock
     const transactions = await Transaction.find({
-      $or: [{ from: stockId }, { to: stockId }],
+      $or: [
+        { from: stockId, transactionStatus: "RECEIVED" },
+        { to: stockId, transactionStatus: "RECEIVED" }
+      ]
+    }).lean();
+
+    // Fetch all pending transactions for this stock (transactionStatus != "RECEIVED")
+    const pendingTransactions = await Transaction.find({
+      $or: [
+        { from: stockId, transactionStatus: { $ne: "RECEIVED" } },
+        { to: stockId, transactionStatus: { $ne: "RECEIVED" } }
+      ]
     }).lean();
 
     // Fetch all lists
@@ -31,9 +42,22 @@ export async function GET(req) {
     allItems.forEach((item) => {
       const id = item._id ? String(item._id) : "Unknown ID";
       if (!idCountMap[id]) {
-        idCountMap[id] = { _id: id, count: 0 };
+        idCountMap[id] = { _id: id, count: 0, pending: 0 };
       }
       idCountMap[id].count += item.adjustedCount;
+    });
+
+    // Add pending count for each item
+    pendingTransactions.forEach((tx) => {
+      (tx.items || []).forEach((item) => {
+        const id = item._id ? String(item._id) : "Unknown ID";
+        if (!idCountMap[id]) {
+          idCountMap[id] = { _id: id, count: 0, pending: 0 };
+        }
+        // Pending count: negative if from, positive if to
+        const pendingAdj = tx.from == stockId ? -(item.count || 0) : item.count || 0;
+        idCountMap[id].pending += pendingAdj;
+      });
     });
 
     // Attach list info

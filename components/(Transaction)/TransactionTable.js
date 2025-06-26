@@ -199,16 +199,18 @@ const TransactionTable = ({
                   <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
                     {txn.createdBy === loggedUser?.sub ? (
                       <>
-                        <button
-                          className={styles.iconBtn}
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onEdit(txn._id || idx);
-                          }}
-                        >
-                          ✏️
-                        </button>
+                        {txn.transactionStatus !== "RECEIVED" && (
+                          <button
+                            className={styles.iconBtn}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEdit(txn._id || idx);
+                            }}
+                          >
+                            ✏️
+                          </button>
+                        )}
                         <button
                           className={styles.iconBtn}
                           type="button"
