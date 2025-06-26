@@ -29,17 +29,70 @@ export async function GET(request) {
   const id = searchParams.get("id");
   const userId = searchParams.get("userId");
   const stock = searchParams.get("stock");
+
+  // Pagination and filter params
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
+  const year = searchParams.get("year");
+  const month = searchParams.get("month");
+  const type = searchParams.get("type");
+  const user = searchParams.get("user");
+  const search = searchParams.get("search");
+  const category = searchParams.get("category");
+
   if (id) {
     const item = await Transaction.findById(id);
     return NextResponse.json(item);
   }
+
+  // Server-side pagination and filtering
   if (userId) {
-    const transactions = await Transaction.find({
+    // Build filter object
+    const filter = {
       $or: [{ from: userId }, { to: userId }],
-    }).sort({ date: -1 });
-    console.log("transactions: UserID");
-    return NextResponse.json(transactions);
+    };
+
+    if (type) filter.transactionType = type;
+    if (category) filter.category = category;
+    if (user) {
+      // If type is SEND, filter by to; else by from
+      if (type === "SEND") filter.to = user;
+      else if (type) filter.from = user;
+      else filter.$or = [{ from: userId, to: user }, { to: userId, from: user }];
+    }
+    if (year) {
+      const yearNum = parseInt(year, 10);
+      filter.date = filter.date || {};
+      filter.date.$gte = new Date(`${yearNum}-01-01`);
+      filter.date.$lte = new Date(`${yearNum}-12-31T23:59:59.999Z`);
+    }
+    if (month) {
+      // If year is also set, use that year, else current year
+      const yearNum = year ? parseInt(year, 10) : new Date().getFullYear();
+      const monthNum = new Date(`${month} 1, ${yearNum}`).getMonth();
+      const start = new Date(yearNum, monthNum, 1);
+      const end = new Date(yearNum, monthNum + 1, 0, 23, 59, 59, 999);
+      filter.date = filter.date || {};
+      filter.date.$gte = start;
+      filter.date.$lte = end;
+    }
+    if (search) {
+      filter.partName = { $regex: search, $options: "i" };
+    }
+
+    // Count total for pagination
+    const total = await Transaction.countDocuments(filter);
+
+    // Fetch paginated results
+    const items = await Transaction.find(filter)
+      .sort({ date: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+
+    return NextResponse.json({ items, total });
   }
+
+  // Stock-specific logic
   if (stock) {
     // Fetch transactions where:
     // - from == stock (any status)

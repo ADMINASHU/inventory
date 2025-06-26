@@ -45,7 +45,7 @@ export async function GET(req) {
     });
 
     // Only include items with count !== 0
-    const result = Object.values(idCountMap).filter(item => item.count !== 0);
+    const result = Object.values(idCountMap);
 
     return NextResponse.json(result);
   }

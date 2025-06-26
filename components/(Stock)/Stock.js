@@ -33,7 +33,7 @@ function TransactionTable({ loggedUser }) {
   const total = filtered.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const paginated = useMemo(
-    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    () => filtered.filter(item => item.count !== 0).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
     [filtered, page]
   );
 

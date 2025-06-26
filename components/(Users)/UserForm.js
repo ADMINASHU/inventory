@@ -10,7 +10,6 @@ const UserForm = ({ open, onClose, onSave, initial, branches = [] }) => {
   const [address, setAddress] = useState('');
   const [branch, setBranch] = useState("");
   const [region, setRegion] = useState('');
-
   const [verified, setVerified] = useState(false);
   const [isSecure, setIsSecure] = useState(null);
   const [inBranch, setInBranch] = useState(false);

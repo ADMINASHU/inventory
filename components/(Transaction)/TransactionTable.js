@@ -188,7 +188,7 @@ const TransactionTable = ({
                             <>
                               {getItemName(item._id)} :{" "}
                               <span className={styles.itemCount}>{item.count}</span>
-                              <br />(<span>{getItemCategory(item._id)}</span>)
+                              {/* <br />(<span>{getItemCategory(item._id)}</span>) */}
                             </>
                           </span>
                         </li>
@@ -196,31 +196,31 @@ const TransactionTable = ({
                   </ul>
                 </td>
                 <td className={styles.td}>
-                  {txn.createdBy === loggedUser?.sub ? (
-                    <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-                      <button
-                        className={styles.iconBtn}
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onEdit(txn._id || idx);
-                        }}
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        className={styles.iconBtn}
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete(txn._id || idx);
-                        }}
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  ) : txn.transactionStatus === "IN PROCESS" ? (
-                    <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                  <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                    {txn.createdBy === loggedUser?.sub ? (
+                      <>
+                        <button
+                          className={styles.iconBtn}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEdit(txn._id || idx);
+                          }}
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          className={styles.iconBtn}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(txn._id || idx);
+                          }}
+                        >
+                          🗑️
+                        </button>
+                      </>
+                    ) : txn.transactionStatus === "IN PROCESS" ? (
                       <button
                         className={styles.iconBtn}
                         type="button"
@@ -231,11 +231,8 @@ const TransactionTable = ({
                       >
                         ✅
                       </button>
-                    </div>
-                  ) : (
-                    <div style={{ display: "flex", gap: "6px", alignItems: "center" }}> </div>
-                  )}
-                  <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                    ) : null}
+                    {/* Create Challan button inline with other buttons */}
                     <button
                       className={styles.iconBtn}
                       type="button"
@@ -259,3 +256,4 @@ const TransactionTable = ({
 };
 
 export default TransactionTable;
+

@@ -126,18 +126,16 @@ const TransactionForm = ({
       setItems(
         initial.items && initial.items.length > 0
           ? initial.items.map((item) => {
-              if (item.partId || item._id) {
-                const part = parts.find(
-                  (p) => p._id === (item.partId || item._id)
-                );
-                return {
-                  ...item,
-                  partId: item.partId || item._id || "",
-                  category: part ? part.category : item.category || "",
-                  partName: part ? part.partName : item.partName || "",
-                };
-              }
-              return { ...emptyItem };
+              // Try to find part in both parts and stock arrays
+              const part =
+                parts.find((p) => p._id === (item.partId || item._id)) ||
+                stock.find((s) => s._id === (item.partId || item._id));
+              return {
+                ...item,
+                partId: item.partId || item._id || "",
+                category: part ? part.category : item.category || "",
+                partName: part ? part.partName : item.partName || "",
+              };
             })
           : [{ ...emptyItem }]
       );
@@ -173,7 +171,7 @@ const TransactionForm = ({
       setApprovedAt("");
       setUpdateHistory([]);
     }
-  }, [open, initial, parts]);
+  }, [open, initial, parts, stock]);
 
   useEffect(() => {
     if (open) {
@@ -227,9 +225,19 @@ const TransactionForm = ({
     setAttachments((atts) => atts.filter((_, i) => i !== idx));
 
   // Helper to get available stock for a part (by _id)
-  const getAvailableStock = (partId) => {
+  const getAvailableStock = (partId, idx = -1) => {
+    // Find the part in stock
     const part = stock.find((s) => s._id === partId);
-    return part ? part.count : 0;
+    let available = part ? part.count : 0;
+
+    // If editing an existing transaction, add back the original count for this item
+    if (initial && initial.items && idx > -1) {
+      const initialItem = initial.items[idx];
+      if (initialItem && (initialItem._id === partId || initialItem.partId === partId)) {
+        available += Number(initialItem.count) || 0;
+      }
+    }
+    return available;
   };
 
   // Helper to get selected part ids (excluding current idx)
@@ -471,7 +479,7 @@ const TransactionForm = ({
                         handleItemChange(idx, "count", Number(e.target.value))
                       }
                       required
-                      max={transactionType === "SEND" ? getAvailableStock(item._id) : undefined}
+                      max={transactionType === "SEND" ? getAvailableStock(item._id, idx) : undefined}
                     />
                     <div style={{ display: "flex", gap: 4 }}>
                       {items.length > 1 && (
@@ -491,13 +499,13 @@ const TransactionForm = ({
                     <div
                       className={styles.availableStockRow}
                       style={{
-                        color: Number(item.count) > getAvailableStock(item._id) ? "red" : "#888",
+                        color: Number(item.count) > getAvailableStock(item._id, idx) ? "red" : "#888",
                         fontSize: "0.95em",
                         marginBottom: 4,
                         marginLeft: 2,
                       }}
                     >
-                      Available stock: {getAvailableStock(item._id)}
+                      Available stock: {getAvailableStock(item._id, idx)}
                     </div>
                   )}
                 </React.Fragment>
@@ -612,4 +620,6 @@ const TransactionForm = ({
 };
 
 export default TransactionForm;
+
+
 

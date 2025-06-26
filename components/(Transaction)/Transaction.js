@@ -6,11 +6,12 @@ import PaginationCard from "./PaginationCard";
 import TransactionForm from "./TransactionForm";
 import styles from "./Transaction.module.css";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 const Transaction = ({ loggedUser }) => {
   const [stock, setStock] = useState([]);
   const [data, setData] = useState([]);
+  const [total, setTotal] = useState(0);
   const [parts, setParts] = useState([]);
   const [users, setUsers] = useState([]);
   const [customers, setCustomers] = useState([]);
@@ -18,8 +19,6 @@ const Transaction = ({ loggedUser }) => {
   const now = new Date();
   const [searchObj, setSearchObj] = useState({
     year: now.getFullYear().toString(),
-    user: "",
-    type: "",
     month: now.toLocaleString("default", { month: "long" }),
     search: "",
   });
@@ -33,9 +32,25 @@ const Transaction = ({ loggedUser }) => {
   const fetchData = useCallback(async () => {
     if (!loggedUser?.branch) return;
     if (!loggedUser?.sub) return;
-    const res = await fetch(`/api/transaction?userId=${loggedUser.sub}`);
-    if (res.ok) setData(await res.json());
-  }, []);
+    // Build query string for filters and pagination
+    const params = new URLSearchParams({
+      userId: loggedUser.sub,
+      page: page.toString(),
+      pageSize: PAGE_SIZE.toString(),
+      year: searchObj.year || "",
+      month: searchObj.month || "",
+      type: searchObj.type || "",
+      user: searchObj.user || "",
+      search: searchObj.search || "",
+      category: category || "",
+    });
+    const res = await fetch(`/api/transaction?${params.toString()}`);
+    if (res.ok) {
+      const json = await res.json();
+      setData(json.items || []);
+      setTotal(json.total || 0);
+    }
+  }, [loggedUser?.branch, loggedUser?.sub, page, PAGE_SIZE, searchObj, category]);
 
   useEffect(() => {
     if (!loggedUser?.sub) return;
@@ -83,32 +98,9 @@ const Transaction = ({ loggedUser }) => {
     fetchCustomers();
   }, [fetchCustomers]);
 
-  const filtered = useMemo(
-    () =>
-      data.filter((item) =>
-        (!category || item.category === category) &&
-        (!searchObj.search || (item.partName || "").toLowerCase().includes(searchObj.search.toLowerCase())) &&
-        (!searchObj.year || (item.date && new Date(item.date).getFullYear().toString() === searchObj.year)) &&
-        (!searchObj.month ||
-          (item.date &&
-            new Date(item.date).toLocaleString("default", { month: "long" }) === searchObj.month)
-        ) &&
-        (!searchObj.type || item.transactionType === searchObj.type) &&
-        (
-          !searchObj.user ||
-          (searchObj.type === "SEND"
-            ? item.to === searchObj.user
-            : item.from === searchObj.user)
-        )
-      ),
-    [data, category, searchObj]
-  );
-  const total = filtered.length;
+  // Remove client-side filtering and slicing, use server data directly
+  const paginated = data;
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const paginated = useMemo(
-    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
-    [filtered, page]
-  );
 
   // Pagination logic for max 5 page buttons
   let startPage = Math.max(1, page - 2);
@@ -229,3 +221,4 @@ const Transaction = ({ loggedUser }) => {
 };
 
 export default Transaction;
+
