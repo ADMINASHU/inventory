@@ -35,10 +35,7 @@ export async function GET(request) {
   const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
   const year = searchParams.get("year");
   const month = searchParams.get("month");
-  const type = searchParams.get("type");
-  const user = searchParams.get("user");
   const search = searchParams.get("search");
-  const category = searchParams.get("category");
 
   if (id) {
     const item = await Transaction.findById(id);
@@ -52,14 +49,6 @@ export async function GET(request) {
       $or: [{ from: userId }, { to: userId }],
     };
 
-    if (type) filter.transactionType = type;
-    if (category) filter.category = category;
-    if (user) {
-      // If type is SEND, filter by to; else by from
-      if (type === "SEND") filter.to = user;
-      else if (type) filter.from = user;
-      else filter.$or = [{ from: userId, to: user }, { to: userId, from: user }];
-    }
     if (year) {
       const yearNum = parseInt(year, 10);
       filter.date = filter.date || {};
@@ -77,7 +66,8 @@ export async function GET(request) {
       filter.date.$lte = end;
     }
     if (search) {
-      filter.partName = { $regex: search, $options: "i" };
+      // Search by transactionId (case-insensitive, partial match)
+      filter.transactionId = { $regex: search, $options: "i" };
     }
 
     // Count total for pagination
@@ -98,10 +88,7 @@ export async function GET(request) {
     // - from == stock (any status)
     // - OR to == stock AND transactionStatus == "RECEIVED"
     const transactions = await Transaction.find({
-      $or: [
-        { from: stock },
-        { to: stock, transactionStatus: "RECEIVED" }
-      ]
+      $or: [{ from: stock }, { to: stock, transactionStatus: "RECEIVED" }],
     }).sort({ date: -1 });
     console.log("transactions:  stock");
     return NextResponse.json(transactions);
@@ -118,12 +105,12 @@ export async function POST(request) {
     // --- Server-side transactionId generation ---
     // If branch is an _id, fetch the branch name from the Branch model
     let branchName = body.branch || "";
-    if (branchName && branchName.length === 24) { // likely a MongoDB ObjectId
-        const branchDoc = await Branch.findById(branchName);
-        if (branchDoc && branchDoc.name) {
-          branchName = branchDoc.name;
-        }
-     
+    if (branchName && branchName.length === 24) {
+      // likely a MongoDB ObjectId
+      const branchDoc = await Branch.findById(branchName);
+      if (branchDoc && branchDoc.name) {
+        branchName = branchDoc.name;
+      }
     }
     const date = body.date ? body.date.slice(0, 10) : ""; // "YYYY-MM-DD"
     if (!branchName || !date) {
@@ -142,9 +129,8 @@ export async function POST(request) {
       { sort: { transactionId: -1 } }
     );
 
-
     const loggedUser = await User.findById(body.createdBy);
-    if (!loggedUser) {  
+    if (!loggedUser) {
       return NextResponse.json({ error: "User not logged in" }, { status: 400 });
     }
     let to = await User.findById(body.to);
@@ -170,8 +156,14 @@ export async function POST(request) {
     }
 
     body.transactionId = generateTransactionId(branchName, date, nextSeries);
-    body.transactionStatus = body.transactionType === "SEND" ? to?.isSecure ? "IN PROCESS" : "RECEIVED" : from?.isSecure ? "IN PROCESS" : "RECEIVED" ;
-
+    body.transactionStatus =
+      body.transactionType === "SEND"
+        ? to?.isSecure
+          ? "IN PROCESS"
+          : "RECEIVED"
+        : from?.isSecure
+        ? "IN PROCESS"
+        : "RECEIVED";
 
     const transaction = await Transaction.create(body);
     return NextResponse.json(transaction, { status: 201 });

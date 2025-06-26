@@ -3,6 +3,7 @@ import styles from "./Transaction.module.css";
 
 const TransactionHeader = ({ searchObj, setSearchObj, onAdd, data = [] }) => {
   const { year, month, search } = searchObj;
+    const now = new Date();
 
   // Update searchObj state
   const setSearch = (key, value) => {
@@ -60,9 +61,21 @@ const TransactionHeader = ({ searchObj, setSearchObj, onAdd, data = [] }) => {
 
           <input
             type="text"
-            placeholder="Search part name..."
+            placeholder="Search Transaction ID"
             value={search}
-            onChange={(e) => setSearch("search", e.target.value)}
+            onChange={(e) => {
+              // If search is present, clear year and month
+              setSearchObj((prev) => ({
+                ...prev,
+                search: e.target.value,
+                ...(e.target.value
+                  ? { year: "", month: "" }
+                  : {
+                      year: now.getFullYear().toString(),
+                      month: now.toLocaleString("default", { month: "long" }),
+                    }),
+              }));
+            }}
             className={styles.input}
           />
         </div>
