@@ -381,7 +381,7 @@ const TransactionForm = ({
               <div className={styles.itemListHeader}>
                 <span>Category</span>
                 <span>Part Name</span>
-                {/* <span>Part ID</span> */}
+                <span>State</span>
                 <span>Count</span>
                 <span style={{ minWidth: 60 }}></span>
               </div>
@@ -418,19 +418,7 @@ const TransactionForm = ({
                           </option>
                         ))}
                     </select>
-                    {/* Count */}
-                    <input
-                      className={styles.input}
-                      type="number"
-                      min={1}
-                      value={item.count ?? 0}
-                      disabled={!item.partName}
-                      onChange={(e) => handleItemChange(idx, "count", Number(e.target.value))}
-                      required
-                      max={
-                        transactionType === "SEND" ? getAvailableStock(item._id, idx) : undefined
-                      }
-                    />
+                 
                     {/* State */}
                     <select
                       className={styles.input}
@@ -445,6 +433,19 @@ const TransactionForm = ({
                       <option value="USED">Used</option>
                       <option value="REPAIRED">Repaired</option>
                     </select>
+                       {/* Count */}
+                    <input
+                      className={styles.input}
+                      type="number"
+                      min={1}
+                      value={item.count ?? 0}
+                      disabled={!item.partName}
+                      onChange={(e) => handleItemChange(idx, "count", Number(e.target.value))}
+                      required
+                      max={
+                        transactionType === "SEND" ? getAvailableStock(item._id, idx) : undefined
+                      }
+                    />
                   
                    
                     
