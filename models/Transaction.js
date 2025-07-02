@@ -8,6 +8,7 @@ const TransactionSchema = new mongoose.Schema(
       {
         _id: { type: mongoose.Schema.Types.ObjectId, auto: false },
         count: { type: Number, required: true },
+        state: { type: String, required: true },
       },
     ],
     total: { type: Number, required: true },

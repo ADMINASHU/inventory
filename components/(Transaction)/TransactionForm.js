@@ -39,7 +39,7 @@ function FloatingLabelTextarea({ label, value, onChange, required, ...props }) {
   );
 }
 
-const emptyItem = { _id: "", count: 0, partName: "", category: "" };
+const emptyItem = { _id: "", count: 0, partName: "", category: "", state:"" };
 const emptyAttachment = { name: "", type: "", id: 0 };
 
 const TransactionForm = ({
@@ -431,6 +431,23 @@ const TransactionForm = ({
                         transactionType === "SEND" ? getAvailableStock(item._id, idx) : undefined
                       }
                     />
+                    {/* State */}
+                    <select
+                      className={styles.input}
+                      type="text"
+                      value={item.state ?? ""}
+                      onChange={(e) => handleItemChange(idx, "state", e.target.value)}
+                      required
+                    >
+                      <option value="">Select State</option>
+                      <option value="NEW">New</option>
+                      <option value="FAULTY">Faulty</option>
+                      <option value="USED">Used</option>
+                      <option value="REPAIRED">Repaired</option>
+                    </select>
+                  
+                   
+                    
                     <div style={{ display: "flex", gap: 4 }}>
                       {items.length > 1 && (
                         <button
