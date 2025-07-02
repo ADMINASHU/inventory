@@ -168,7 +168,7 @@ const Doc = ({
                 <span style={entryStyle}> ({getItemCategory(item._id)})</span>
               </td>
               <td className={styles.cell + " " + styles.right}>
-                <span style={entryStyle}>{item.count} Nos</span>
+                <span style={entryStyle}>{item.count}</span>
               </td>
               <td className={styles.cell}>
                 <span style={entryStyle}></span>
@@ -202,13 +202,13 @@ const Doc = ({
         <td className={styles.cell} colSpan={2} style={{ textAlign: "right", fontWeight: 600 }}>
           Total Nos
         </td>
-        <td className={styles.cell}>
-          <span style={entryStyle}>{txn.total} Nos</span>
+        <td className={styles.cell + " " + styles.right}>
+          <span style={entryStyle}>{txn.total}</span>
         </td>
         <td className={styles.cell} colSpan={1} style={{ textAlign: "right", fontWeight: 600 }}>
           Total Amount
         </td>
-        <td className={styles.cell}>
+          <td className={styles.cell + " " + styles.right}>
           <span style={entryStyle}></span>
         </td>
       </tr>
