@@ -10,21 +10,13 @@ const TransactionHeader = ({ searchObj, setSearchObj, onAdd, data = [] }) => {
     setSearchObj((prev) => ({ ...prev, [key]: value }));
   };
 
-  // Extract month and year from item.date
-  const monthOptions = Array.from(
-    new Set(
-      data
-        .map((item) =>
-          item.date ? new Date(item.date).toLocaleString("default", { month: "long" }) : null
-        )
-        .filter(Boolean)
-    )
+  // Month options: all months (Jan-Dec)
+  const monthOptions = Array.from({ length: 12 }, (_, i) =>
+    new Date(2000, i, 1).toLocaleString("default", { month: "long" })
   );
-  const yearOptions = Array.from(
-    new Set(
-      data.map((item) => (item.date ? new Date(item.date).getFullYear() : null)).filter(Boolean)
-    )
-  );
+  // Year options: current year and next 4 years
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 5 }, (_, i) => (currentYear + i).toString());
 
   const monthSelectOptions = monthOptions.map((month) => (
     <option key={month} value={month}>
@@ -87,3 +79,4 @@ const TransactionHeader = ({ searchObj, setSearchObj, onAdd, data = [] }) => {
   );
 };
 export default TransactionHeader;
+
