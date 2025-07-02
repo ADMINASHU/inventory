@@ -14,13 +14,25 @@ async function parseBody(request) {
   }
 }
 
-// Helper to generate transactionId
-function generateTransactionId(branchName, date, series = 1) {
-  if (!branchName || !date) return "";
+// Helper to get financial year period string (e.g., "2024-25")
+function getFinancialYearPeriod(dateStr) {
+  const date = new Date(dateStr);
+  let year = date.getFullYear();
+  let nextYear = year + 1;
+  // If before April, it's previous FY
+  if (date.getMonth() < 3) {
+    year = year - 1;
+    nextYear = year + 1;
+  }
+  return `${year}-${String(nextYear).slice(-2)}`;
+}
+
+// Helper to generate transactionId with new format: PREFIX/0001/2024-25
+function generateTransactionId(branchName, finYearPeriod, series = 1) {
+  if (!branchName || !finYearPeriod) return "";
   const prefix = branchName.slice(0, 3).toUpperCase();
-  const yymmdd = date.replace(/-/g, "").slice(2, 8); // "YYYY-MM-DD" -> "YYMMDD"
   const seriesStr = String(series).padStart(4, "0");
-  return `${prefix}${yymmdd}-${seriesStr}`;
+  return `${prefix}/${seriesStr}/${finYearPeriod}`;
 }
 
 export async function GET(request) {
@@ -117,14 +129,15 @@ export async function POST(request) {
       return NextResponse.json({ error: "branch and date are required" }, { status: 400 });
     }
 
-    // Find latest transaction for this branch and date
-    const prefix = branchName.slice(0, 3).toUpperCase();
-    const yymmdd = date.replace(/-/g, "").slice(2, 8);
-    const idPrefix = `${prefix}${yymmdd}-`;
+    // Compute financial year period
+    const finYearPeriod = getFinancialYearPeriod(date);
 
-    // Find the latest transactionId for this branch/date
+    // Find the latest transactionId for this branch and financial year period
+    const prefix = branchName.slice(0, 3).toUpperCase();
+    const idPrefix = `${prefix}/\\d{4}/${finYearPeriod}`;
+
     const latest = await Transaction.findOne(
-      { transactionId: { $regex: `^${idPrefix}\\d{4}$` } },
+      { transactionId: { $regex: `^${prefix}/\\d{4}/${finYearPeriod}$` } },
       {},
       { sort: { transactionId: -1 } }
     );
@@ -149,13 +162,13 @@ export async function POST(request) {
     }
     let nextSeries = 1;
     if (latest && latest.transactionId) {
-      const match = latest.transactionId.match(/-(\d{4})$/);
+      const match = latest.transactionId.match(/\/(\d{4})\//);
       if (match) {
         nextSeries = parseInt(match[1], 10) + 1;
       }
     }
 
-    body.transactionId = generateTransactionId(branchName, date, nextSeries);
+    body.transactionId = generateTransactionId(branchName, finYearPeriod, nextSeries);
     body.transactionStatus =
       body.transactionType === "SEND"
         ? to?.isSecure
