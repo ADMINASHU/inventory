@@ -16,6 +16,8 @@ const TransactionSchema = new mongoose.Schema(
     transactionType: { type: String, required: true, enum: ["SEND", "RECEIVED"] },
     from: { type: mongoose.Schema.Types.ObjectId, auto: false, required: true },
     to: { type: mongoose.Schema.Types.ObjectId, auto: false, required: true },
+    orderNo: { type: String },
+    orderedDate: { type: Date },
     createdBy: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
     updateHistory: [

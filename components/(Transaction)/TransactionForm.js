@@ -39,7 +39,7 @@ function FloatingLabelTextarea({ label, value, onChange, required, ...props }) {
   );
 }
 
-const emptyItem = { _id: "", count: 0, partName: "", category: "", state:"" };
+const emptyItem = { _id: "", count: 0, partName: "", category: "", state: "" };
 const emptyAttachment = { name: "", type: "", id: 0 };
 
 const TransactionForm = ({
@@ -56,15 +56,14 @@ const TransactionForm = ({
   setFrom,
   transactionType,
   setTransactionType,
-
 }) => {
   const [date, setDate] = useState("");
   const [items, setItems] = useState([{ ...emptyItem }]);
   const [total, setTotal] = useState(0);
   const [transactionMethod, setTransactionMethod] = useState("");
-  // const [transactionType, setTransactionType] = useState("");
-  // const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [orderedDate, setOrderedDate] = useState("");
+  const [orderNo, setOrderNo] = useState(null);
   const [createdBy, setCreatedBy] = useState("");
   const [note, setNote] = useState("");
   const [attachments, setAttachments] = useState([]);
@@ -97,9 +96,6 @@ const TransactionForm = ({
     }
   }, [from, to]);
 
-
-
-
   useEffect(() => {
     if (open && initial) {
       // Only run this effect when opening the form for edit (initial exists)
@@ -123,6 +119,8 @@ const TransactionForm = ({
       setTransactionType(initial.transactionType || "");
       setFrom(initial.from);
       setTo(initial.to);
+      setOrderedDate(initial.orderedDate ? initial.orderedDate.slice(0, 10) : "");
+      setOrderNo(initial.orderNo || null);
       setCreatedBy(initial.createdBy || "");
       setNote(initial.note || "");
       setAttachments(initial.attachment && initial.attachment.length > 0 ? initial.attachment : []);
@@ -137,8 +135,10 @@ const TransactionForm = ({
       setItems([{ ...emptyItem }]);
       setTransactionMethod("");
       setTransactionType("SEND");
-      setFrom("");// will be set by transactionType effect below
+      setFrom(""); // will be set by transactionType effect below
       setTo("");
+      setOrderedDate(new Date().toISOString().slice(0, 10));
+      setOrderNo(null);
       setCreatedBy(loggedUser?.sub || "");
       setNote("");
       setAttachments([]);
@@ -241,6 +241,13 @@ const TransactionForm = ({
   }, [transactionType, parts, stock]);
   const allSelected = items.length >= allSelectableIds.length;
 
+  // Helper: is the selected "to" a customer?
+  const isToCustomer =
+    transactionType === "SEND" &&
+    to &&
+    customers.some((c) => c._id === to) &&
+    !users.some((u) => u._id === to);
+
   if (!open) return null;
   return (
     <div className={styles.modalOverlay}>
@@ -259,6 +266,8 @@ const TransactionForm = ({
               transactionType,
               from,
               to,
+              orderedDate,
+              orderNo,
               createdBy,
               note,
               attachment: attachments,
@@ -336,7 +345,6 @@ const TransactionForm = ({
                     value={to}
                     onChange={(e) => setTo(e.target.value)}
                     required
-                    // disabled={!from}
                   >
                     <option value="">Select To User</option>
                     {availableToUsers.map((u) => (
@@ -349,6 +357,24 @@ const TransactionForm = ({
                     To
                   </label>
                 </div>
+              )}
+              {/* Show Ordered Date/No only if SEND and To is a customer */}
+              {isToCustomer && (
+                <>
+                  <FloatingLabelInput
+                    label="Ordered Date"
+                    type="date"
+                    value={orderedDate}
+                    onChange={(e) => setOrderedDate(e.target.value)}
+                    required
+                  />
+                  <FloatingLabelInput
+                    label="Order No."
+                    value={orderNo}
+                    onChange={(e) => setOrderNo(e.target.value)}
+                    required
+                  />
+                </>
               )}
             </div>
             <FloatingLabelTextarea
@@ -418,7 +444,7 @@ const TransactionForm = ({
                           </option>
                         ))}
                     </select>
-                 
+
                     {/* State */}
                     <select
                       className={styles.input}
@@ -433,7 +459,7 @@ const TransactionForm = ({
                       <option value="USED">Used</option>
                       <option value="REPAIRED">Repaired</option>
                     </select>
-                       {/* Count */}
+                    {/* Count */}
                     <input
                       className={styles.input}
                       type="number"
@@ -446,9 +472,7 @@ const TransactionForm = ({
                         transactionType === "SEND" ? getAvailableStock(item._id, idx) : undefined
                       }
                     />
-                  
-                   
-                    
+
                     <div style={{ display: "flex", gap: 4 }}>
                       {items.length > 1 && (
                         <button

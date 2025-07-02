@@ -1,10 +1,15 @@
 import React from "react";
 import styles from "./Doc.module.css";
+import { custom } from "zod";
 
 // Helper to get user's fName by id
 const getUserName = (id, users) => {
   const user = users?.find((u) => u._id === id);
   return user ? user.fName : id;
+};
+const getCustomerName = (id, customers) => {
+  const customer = customers?.find((c) => c._id === id);
+  return customer ? customer.name : id;
 };
 const getBranchAddress = (id, branches) => {
   const branch = branches?.find((b) => b._id === id);
@@ -24,9 +29,18 @@ const getUserAddress = (id, users, branches) => {
   }
   return user.address;
 };
+const getCustomerAddress = (id, customers, branches) => {
+  const customer = customers?.find((c) => c._id === id);
+  if (!customer) return "";
+  return customer.address || "";
+};
 const getUserContact = (id, users) => {
   const user = users?.find((u) => u._id === id);
   return user ? user.mobileNo : "";
+};
+const getCustomerContact = (id, customers) => {
+  const customer = customers?.find((c) => c._id === id);
+  return customer ? customer.mobileNo : "";
 };
 
 const getAreaOfficeAddress = (id, users, branches) => {
@@ -45,6 +59,12 @@ const getAreaOfficeGST = (id, users, branches) => {
     return gst ? gst : "";
   }
 };
+const getCustomerGST = (id, customers, branches) => {
+  const customer = customers?.find((c) => c._id === id);
+  if (!customer) return "";
+  const gst = customer.gst || "";
+  return gst ? gst : "";
+};
 
 // Make entry values a little bold and colored
 const entryStyle = { color: "rgb(120,120,120)", fontWeight: 500 };
@@ -53,6 +73,7 @@ const Doc = ({
   txn = {},
   users = [],
   branches = [],
+  customers = [],
   getItemCategory,
   getItemName,
 }) => (
@@ -70,9 +91,7 @@ const Doc = ({
         </div>
         <div>
           Dated:{" "}
-          <span style={entryStyle}>
-            {txn.date ? new Date(txn.date).toLocaleDateString() : ""}
-          </span>
+          <span style={entryStyle}>{txn.date ? new Date(txn.date).toLocaleDateString() : ""}</span>
         </div>
       </div>
     </div>
@@ -80,29 +99,30 @@ const Doc = ({
     <div className={styles.officeInfo}>
       <span className={styles.bold}>Area Office:</span>
       {getAreaOfficeAddress(txn.from, users, branches)}
-      {getUserContact(txn.from, users)
-        ? `, Ph. No.: ${getUserContact(txn.from, users)}`
-        : ""}
+      {getUserContact(txn.from, users) ? `, Ph. No.: ${getUserContact(txn.from, users)}` : ""}
       <br />
     </div>
     <div className={styles.officeInfo}>
-      <span className={styles.bold}>Head Office:</span> “TECHSER HOUSE” #12/1,
-      5th Cross, MES Ring Road, Sharadamba Nagar, Jalahalli, Bangalore - 560013,
-      Ph. No.: 080 - 28384854 / 28384517 / 23458706
+      <span className={styles.bold}>Head Office:</span> “TECHSER HOUSE” #12/1, 5th Cross, MES Ring
+      Road, Sharadamba Nagar, Jalahalli, Bangalore - 560013, Ph. No.: 080 - 28384854 / 28384517 /
+      23458706
     </div>
     <table className={styles.infoTable}>
       <tbody>
         <tr>
           <td className={styles.infoCellLeft}>
             <div>
-              M/s. <span style={entryStyle}>{getUserName(txn.to, users)}</span>
+              M/s.{" "}
+              <span style={entryStyle}>
+                {txn.orderNo ? getCustomerName(txn.to, customers) : getUserName(txn.to, users)}
+              </span>
               , <br />
               <span style={entryStyle}>
-                {getUserAddress(txn.to, users, branches)}
-                {getUserContact(txn.to, users) ? (
+                {txn.orderNo ? getCustomerAddress(txn.to, customers, branches) : getUserAddress(txn.to, users, branches)}
+                {getUserContact(txn.to, users) || getCustomerContact(txn.to, customers) ? (
                   <>
                     , <br />
-                    Ph. No.: {getUserContact(txn.to, users)}
+                    Ph. No.: {txn.orderNo ? getCustomerContact(txn.to, customers) : getUserContact(txn.to, users)}
                   </>
                 ) : (
                   ""
@@ -114,19 +134,22 @@ const Doc = ({
             <div>
               Order Date:{" "}
               <span style={entryStyle}>
-                {txn.date ? new Date(txn.date).toLocaleDateString() : ""}
+                {txn.orderedDate ? new Date(txn.orderedDate).toLocaleDateString() : ""}
               </span>
             </div>
             <div>
-              Order No.:{" "}
-              <span style={entryStyle}>{txn.transactionId || ""}</span>
+              Order No.: <span style={entryStyle}>{txn.orderNo || ""}</span>
             </div>
             <div>
-              GSTIN: <span style={entryStyle}></span>
+              GSTIN:{" "}
+              <span style={entryStyle}>
+                {txn.orderNo
+                  ? getCustomerGST(txn.to, customers, branches)
+                  : getAreaOfficeGST(txn.to, users, branches)}
+              </span>
             </div>
             <div>
-              Mode of despatch:{" "}
-              <span style={entryStyle}>{txn.transactionMethod || ""}</span>
+              Mode of despatch: <span style={entryStyle}>{txn.transactionMethod || ""}</span>
             </div>
           </td>
         </tr>
@@ -135,25 +158,11 @@ const Doc = ({
     <table className={styles.itemsTable}>
       <thead>
         <tr>
-          <th className={styles.cell + " " + styles.center + " " + styles.slno}>
-            S.No
-          </th>
-          <th className={styles.cell + " " + styles.center + " " + styles.desc}>
-            DESCRIPTION
-          </th>
-          <th className={styles.cell + " " + styles.center + " " + styles.qty}>
-            QTY.
-          </th>
-          <th className={styles.cell + " " + styles.center + " " + styles.rate}>
-            RATE / UNIT
-         
-          </th>
-          <th
-            className={styles.cell + " " + styles.center + " " + styles.amount}
-          >
-            AMOUNT
-            
-          </th>
+          <th className={styles.cell + " " + styles.center + " " + styles.slno}>S.No</th>
+          <th className={styles.cell + " " + styles.center + " " + styles.desc}>DESCRIPTION</th>
+          <th className={styles.cell + " " + styles.center + " " + styles.qty}>QTY.</th>
+          <th className={styles.cell + " " + styles.center + " " + styles.rate}>RATE / UNIT</th>
+          <th className={styles.cell + " " + styles.center + " " + styles.amount}>AMOUNT</th>
         </tr>
       </thead>
       <tbody>
@@ -165,7 +174,7 @@ const Doc = ({
               </td>
               <td className={styles.cell}>
                 <span style={entryStyle}>{getItemName(item._id)}</span>
-                <span style={entryStyle}> ({getItemCategory(item._id)})</span>
+                <span style={entryStyle}> ({item.state})</span>
               </td>
               <td className={styles.cell + " " + styles.right}>
                 <span style={entryStyle}>{item.count}</span>
@@ -200,15 +209,15 @@ const Doc = ({
       </tbody>
       <tr>
         <td className={styles.cell} colSpan={2} style={{ textAlign: "right", fontWeight: 600 }}>
-          Total Nos
+          TOTAL
         </td>
         <td className={styles.cell + " " + styles.right}>
           <span style={entryStyle}>{txn.total}</span>
         </td>
         <td className={styles.cell} colSpan={1} style={{ textAlign: "right", fontWeight: 600 }}>
-          Total Amount
+         
         </td>
-          <td className={styles.cell + " " + styles.right}>
+        <td className={styles.cell + " " + styles.right}>
           <span style={entryStyle}></span>
         </td>
       </tr>
@@ -224,8 +233,7 @@ const Doc = ({
       </div>
       <div className={styles.footerRight}>
         <span>
-          For{" "}
-          <span className={styles.bold}>Techser Power Solutions Pvt. Ltd.</span>
+          For <span className={styles.bold}>Techser Power Solutions Pvt. Ltd.</span>
           <br />
           <br />
           <span className={styles.footerNote}>Authorised Signatory</span>

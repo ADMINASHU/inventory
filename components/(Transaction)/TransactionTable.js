@@ -111,7 +111,7 @@ const TransactionTable = ({
               Challan Preview
             </div>
             <div ref={challanRef}>
-              <Doc txn={challanTxn} users={users} branches={branches} getItemName={getItemName} getItemCategory={getItemCategory} />
+              <Doc txn={challanTxn} users={users} branches={branches} getItemName={getItemName} getItemCategory={getItemCategory} customers={customers} />
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
               <button className={styles.addBtn} onClick={handleDownloadPDF} disabled={printing}>
