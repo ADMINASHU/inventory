@@ -248,6 +248,12 @@ const TransactionForm = ({
     customers.some((c) => c._id === to) &&
     !users.some((u) => u._id === to);
 
+  const isFromCustomer =
+    transactionType === "RECEIVED" &&
+    from &&
+    customers.some((c) => c._id === from) &&
+    !users.some((u) => u._id === from);
+
   if (!open) return null;
   return (
     <div className={styles.modalOverlay}>
@@ -469,7 +475,7 @@ const TransactionForm = ({
                       onChange={(e) => handleItemChange(idx, "count", Number(e.target.value))}
                       required
                       max={
-                        transactionType === "SEND" ? getAvailableStock(item._id, idx) : undefined
+                        !isFromCustomer ? getAvailableStock(item._id, idx) : undefined
                       }
                     />
 
@@ -487,20 +493,23 @@ const TransactionForm = ({
                     </div>
                   </div>
                   {/* Available stock row just below each item */}
-                  {item.category && item.partName && (item.count === null || item.count > 0) && (
-                    <div
-                      className={styles.availableStockRow}
-                      style={{
-                        color:
-                          Number(item.count) > getAvailableStock(item._id, idx) ? "red" : "#888",
-                        fontSize: "0.95em",
-                        marginBottom: 4,
-                        marginLeft: 2,
-                      }}
-                    >
-                      Available stock: {getAvailableStock(item._id, idx)}
-                    </div>
-                  )}
+                  {!isFromCustomer &&
+                    item.category &&
+                    item.partName &&
+                    (item.count === null || item.count > 0) && (
+                      <div
+                        className={styles.availableStockRow}
+                        style={{
+                          color:
+                            Number(item.count) > getAvailableStock(item._id, idx) ? "red" : "#888",
+                          fontSize: "0.95em",
+                          marginBottom: 4,
+                          marginLeft: 2,
+                        }}
+                      >
+                        Available stock: {getAvailableStock(item._id, idx)}
+                      </div>
+                    )}
                 </React.Fragment>
               ))}
             </div>
