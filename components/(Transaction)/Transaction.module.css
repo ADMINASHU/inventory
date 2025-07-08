@@ -434,6 +434,25 @@
   padding: 0 4px;
 }
 
+.checkedBtn {
+  accent-color: #1976d2;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.label {
+  font-size: 15px;
+  color: #1976d2;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
 @media (max-width: 600px) {
   .header, .pagination {
     flex-direction: column;

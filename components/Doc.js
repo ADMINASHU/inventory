@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./Doc.module.css";
-import { custom } from "zod";
+
 
 // Helper to get user's fName by id
 const getUserName = (id, users) => {
@@ -65,6 +65,12 @@ const getCustomerGST = (id, customers, branches) => {
   const gst = customer.gst || "";
   return gst ? gst : "";
 };
+
+// Currency formatter (INR)
+const formatCurrency = (value) =>
+  typeof value === "number"
+    ? value.toLocaleString("en-IN", { style: "currency", currency: "INR", minimumFractionDigits: 2 })
+    : value;
 
 // Make entry values a little bold and colored
 const entryStyle = { color: "rgb(120,120,120)", fontWeight: 500 };
@@ -188,12 +194,12 @@ const Doc = ({
               </td>
               <td className={styles.cell + " " + styles.right}>
                 <span className="rate" style={entryStyle}>
-                  {!hideRateAndTotal ? getItemRate(item._id) : ""}
+                  {!hideRateAndTotal ? formatCurrency(getItemRate(item._id)) : ""}
                 </span>
               </td>
               <td className={styles.cell + " " + styles.right}>
                 <span className="amount" style={entryStyle}>
-                  {!hideRateAndTotal ? getItemRate(item._id) * item.count : ""}
+                  {!hideRateAndTotal ? formatCurrency(getItemRate(item._id) * item.count) : ""}
                 </span>
               </td>
             </tr>
@@ -223,7 +229,9 @@ const Doc = ({
           TOTAL
         </td>
         <td className={styles.cell + " " + styles.right}>
-          <span style={entryStyle}>{txn.total}</span>
+          <span style={{ ...entryStyle, fontWeight: 700 }}>
+            {txn.total}
+          </span>
         </td>
         <td
           className={styles.cell + " " + styles.right}
@@ -231,11 +239,13 @@ const Doc = ({
           style={{ textAlign: "right", fontWeight: 600 }}
         ></td>
         <td className={styles.cell + " " + styles.right + " " + styles.total}>
-          <span style={entryStyle}>
+          <span style={{ ...entryStyle, fontWeight: 700 }}>
             {!hideRateAndTotal
-              ? txn.items
-                  .map((item, idx) => getItemRate(item._id) * item.count)
-                  .reduce((acc, curr) => acc + curr, 0)
+              ? formatCurrency(
+                  txn.items
+                    .map((item, idx) => getItemRate(item._id) * item.count)
+                    .reduce((acc, curr) => acc + curr, 0)
+                )
               : ""}
           </span>
         </td>

@@ -131,12 +131,15 @@ const TransactionTable = ({
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
               {/* Add here toggle button to choose whether the rate and total amount displayed or not */}
-              <input
-                type="checkbox"
-                className={styles.checkedBtn}
-                onChange={(e) => setShowRateAndTotal(e.target.checked)}
-                checked={showRateAndTotal}
-              />
+              <div>
+                <input
+                  type="checkbox"
+                  className={styles.checkedBtn}
+                  onChange={(e) => setShowRateAndTotal(e.target.checked)}
+                  checked={showRateAndTotal}
+                />
+                <label className={styles.label}>Show Price</label>
+              </div>
               <button className={styles.addBtn} onClick={handleDownloadPDF} disabled={printing}>
                 Download PDF
               </button>
