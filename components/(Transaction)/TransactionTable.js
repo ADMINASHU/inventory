@@ -1,8 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./Transaction.module.css";
 import Doc from "../Doc";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { set } from "mongoose";
 
 const TransactionTable = ({
   paginated,
@@ -18,6 +19,8 @@ const TransactionTable = ({
   parts = [],
 }) => {
   // Helper to get user's fName by id
+  const [showRateAndTotal, setShowRateAndTotal] = useState(false);
+
   const getUserName = (id) => {
     const user = users.find((u) => u._id === id);
     const customer = customers.find((c) => c._id === id);
@@ -111,13 +114,29 @@ const TransactionTable = ({
       {challanTxn && (
         <div className={styles.modalOverlay} onClick={() => !printing && setChallanTxn(null)}>
           <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-            <div style={{ marginBottom: 12, fontWeight: 600, fontSize: 18, textAlign: "center" }}>
+            <div style={{ marginBottom: 0, fontWeight: 600, fontSize: 18, textAlign: "center" }}>
               Challan Preview
             </div>
             <div ref={challanRef}>
-              <Doc txn={challanTxn} users={users} branches={branches} getItemName={getItemName} getItemCategory={getItemCategory} customers={customers} getItemRate={getItemRate} />
+              <Doc
+                txn={challanTxn}
+                users={users}
+                branches={branches}
+                getItemName={getItemName}
+                getItemCategory={getItemCategory}
+                customers={customers}
+                getItemRate={getItemRate}
+                hideRateAndTotal={showRateAndTotal}
+              />
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+              {/* Add here toggle button to choose whether the rate and total amount displayed or not */}
+              <input
+                type="checkbox"
+                className={styles.checkedBtn}
+                onChange={(e) => setShowRateAndTotal(e.target.checked)}
+                checked={showRateAndTotal}
+              />
               <button className={styles.addBtn} onClick={handleDownloadPDF} disabled={printing}>
                 Download PDF
               </button>
@@ -245,6 +264,7 @@ const TransactionTable = ({
                       onClick={(e) => {
                         e.stopPropagation();
                         setChallanTxn(txn);
+                        setShowRateAndTotal(false); // Reset to default state
                       }}
                       title="Create Challan"
                     >
@@ -262,4 +282,3 @@ const TransactionTable = ({
 };
 
 export default TransactionTable;
-

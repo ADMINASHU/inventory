@@ -77,6 +77,7 @@ const Doc = ({
   getItemCategory,
   getItemName,
   getItemRate,
+  hideRateAndTotal = false, // new prop
 }) => (
   <div className={styles.docWrapper}>
     <div className={styles.title}>DELIVERY CHALLAN</div>
@@ -186,10 +187,14 @@ const Doc = ({
                 <span style={entryStyle}>{item.count}</span>
               </td>
               <td className={styles.cell + " " + styles.right}>
-                <span style={entryStyle}>{getItemRate(item._id)}</span>
+                <span className="rate" style={entryStyle}>
+                  {!hideRateAndTotal ? getItemRate(item._id) : ""}
+                </span>
               </td>
               <td className={styles.cell + " " + styles.right}>
-                <span style={entryStyle}>{getItemRate(item._id) * item.count}</span>
+                <span className="amount" style={entryStyle}>
+                  {!hideRateAndTotal ? getItemRate(item._id) * item.count : ""}
+                </span>
               </td>
             </tr>
           ))
@@ -221,12 +226,18 @@ const Doc = ({
           <span style={entryStyle}>{txn.total}</span>
         </td>
         <td
-          className={styles.cell}
+          className={styles.cell + " " + styles.right}
           colSpan={1}
           style={{ textAlign: "right", fontWeight: 600 }}
         ></td>
-        <td className={styles.cell + " " + styles.right}>
-          <span style={entryStyle}> {txn.items.map((item, idx) => (getItemRate(item._id) * item.count)).reduce((acc, curr) => acc + curr, 0)}</span>
+        <td className={styles.cell + " " + styles.right + " " + styles.total}>
+          <span style={entryStyle}>
+            {!hideRateAndTotal
+              ? txn.items
+                  .map((item, idx) => getItemRate(item._id) * item.count)
+                  .reduce((acc, curr) => acc + curr, 0)
+              : ""}
+          </span>
         </td>
       </tr>
     </table>
