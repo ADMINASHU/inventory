@@ -76,6 +76,7 @@ const Doc = ({
   customers = [],
   getItemCategory,
   getItemName,
+  getItemRate,
 }) => (
   <div className={styles.docWrapper}>
     <div className={styles.title}>DELIVERY CHALLAN</div>
@@ -118,11 +119,16 @@ const Doc = ({
               </span>
               , <br />
               <span style={entryStyle}>
-                {txn.orderNo ? getCustomerAddress(txn.to, customers, branches) : getUserAddress(txn.to, users, branches)}
+                {txn.orderNo
+                  ? getCustomerAddress(txn.to, customers, branches)
+                  : getUserAddress(txn.to, users, branches)}
                 {getUserContact(txn.to, users) || getCustomerContact(txn.to, customers) ? (
                   <>
                     , <br />
-                    Ph. No.: {txn.orderNo ? getCustomerContact(txn.to, customers) : getUserContact(txn.to, users)}
+                    Ph. No.:{" "}
+                    {txn.orderNo
+                      ? getCustomerContact(txn.to, customers)
+                      : getUserContact(txn.to, users)}
                   </>
                 ) : (
                   ""
@@ -179,11 +185,11 @@ const Doc = ({
               <td className={styles.cell + " " + styles.right}>
                 <span style={entryStyle}>{item.count}</span>
               </td>
-              <td className={styles.cell}>
-                <span style={entryStyle}></span>
+              <td className={styles.cell + " " + styles.right}>
+                <span style={entryStyle}>{getItemRate(item._id)}</span>
               </td>
-              <td className={styles.cell}>
-                <span style={entryStyle}></span>
+              <td className={styles.cell + " " + styles.right}>
+                <span style={entryStyle}>{getItemRate(item._id) * item.count}</span>
               </td>
             </tr>
           ))
@@ -214,11 +220,13 @@ const Doc = ({
         <td className={styles.cell + " " + styles.right}>
           <span style={entryStyle}>{txn.total}</span>
         </td>
-        <td className={styles.cell} colSpan={1} style={{ textAlign: "right", fontWeight: 600 }}>
-         
-        </td>
+        <td
+          className={styles.cell}
+          colSpan={1}
+          style={{ textAlign: "right", fontWeight: 600 }}
+        ></td>
         <td className={styles.cell + " " + styles.right}>
-          <span style={entryStyle}></span>
+          <span style={entryStyle}> {txn.items.map((item, idx) => (getItemRate(item._id) * item.count)).reduce((acc, curr) => acc + curr, 0)}</span>
         </td>
       </tr>
     </table>

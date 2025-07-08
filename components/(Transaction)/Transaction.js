@@ -31,6 +31,9 @@ const Transaction = ({ loggedUser }) => {
   const [transactionType, setTransactionType] = useState("SEND");
    const [from, setFrom] = useState("");
 
+   useEffect(() => {
+    setPage(1);
+  }, [searchObj, category, loggedUser?.branch]);
   const fetchData = useCallback(async () => {
     if (!loggedUser?.branch) return;
     if (!loggedUser?.sub) return;

@@ -13,6 +13,7 @@ const ListTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) =
             <th>Part Name</th>
             <th>Category</th>
             <th>Description</th>
+            <th>Rate</th>
           </tr>
         </thead>
         <tbody>
@@ -43,8 +44,9 @@ const ListTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) =
                 <td>{idx + 1}</td>
                 <td>{item.partName}</td>
                 <td>{item.category}</td>
+                <td>{item.description}</td>
                 <td style={{ position: 'relative' }}>
-                  {item.description}
+                  {item.rate}
                   {isSelected && (
                     <span
                       className={styles.rowActions}

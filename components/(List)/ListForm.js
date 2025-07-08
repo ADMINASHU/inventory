@@ -5,6 +5,7 @@ const ListForm = ({ open, onClose, onSave, initial, data }) => {
   const [partName, setPartName] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
+  const [rate, setRate] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const inputRef = useRef(null);
@@ -26,6 +27,7 @@ const ListForm = ({ open, onClose, onSave, initial, data }) => {
       setPartName(initial?.partName || '');
       setCategory(initial?.category || '');
       setDescription(initial?.description || '');
+      setRate(initial?.rate || null);
     }
   }, [open, initial]);
 
@@ -88,6 +90,14 @@ const ListForm = ({ open, onClose, onSave, initial, data }) => {
             )}
           </div>
           <input className={styles.input} placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />
+            <input
+            className={styles.input}
+            type="number"
+            placeholder="Rate"
+            value={rate !== null ? rate : ''}
+            onChange={e => setRate(e.target.value ? parseFloat(e.target.value) : null)}
+            min="0"
+          /> 
         </div>
         <div style={{ marginTop: 18, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
           <button className={styles.pageBtn} onClick={onClose}>Cancel</button>
@@ -96,6 +106,7 @@ const ListForm = ({ open, onClose, onSave, initial, data }) => {
               partName,
               category,
               description,
+              rate,
               counts: []
             });
           }}>{initial && !Array.isArray(initial) ? 'Update' : 'Add'}</button>

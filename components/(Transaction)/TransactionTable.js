@@ -32,6 +32,10 @@ const TransactionTable = ({
     const item = parts.find((i) => i._id === id);
     return item ? item.category : id;
   };
+  const getItemRate = (id) => {
+    const item = parts.find((i) => i._id === id);
+    return item ? item.rate : 0;
+  };
   // Modal state for challan
   const [challanTxn, setChallanTxn] = useState(null);
   const [printing, setPrinting] = useState(false);
@@ -111,7 +115,7 @@ const TransactionTable = ({
               Challan Preview
             </div>
             <div ref={challanRef}>
-              <Doc txn={challanTxn} users={users} branches={branches} getItemName={getItemName} getItemCategory={getItemCategory} customers={customers} />
+              <Doc txn={challanTxn} users={users} branches={branches} getItemName={getItemName} getItemCategory={getItemCategory} customers={customers} getItemRate={getItemRate} />
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
               <button className={styles.addBtn} onClick={handleDownloadPDF} disabled={printing}>
