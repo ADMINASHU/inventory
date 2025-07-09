@@ -15,8 +15,8 @@ const StockTable = ({ paginated, PAGE_SIZE, page }) => {
         <thead>
           <tr>
             <th>S No</th>
-            <th>Part Name</th>
             <th>Category</th>
+            <th>Part Name</th>
             <th>Description</th>
             <th>Total Stock</th>
           </tr>
@@ -42,8 +42,8 @@ const StockTable = ({ paginated, PAGE_SIZE, page }) => {
                   onDoubleClick={() => handleRowDoubleClick(item._id)}
                 >
                   <td> {(page - 1) * PAGE_SIZE + idx + 1}</td>
-                  <td>{item.partName}</td>
                   <td>{item.category}</td>
+                  <td>{item.partName}</td>
                   <td style={{ position: "relative" }}>{item.description}</td>
                   <td>{item.count}</td>
                 </tr>

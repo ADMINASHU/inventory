@@ -10,8 +10,8 @@ const ListTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) =
         <thead>
           <tr>
             <th>S No</th>
-            <th>Part Name</th>
             <th>Category</th>
+            <th>Part Name</th>
             <th>Description</th>
             <th>Rate</th>
           </tr>
@@ -42,8 +42,8 @@ const ListTable = ({ paginated, selectedId, setSelectedId, onEdit, onDelete }) =
                 }}
               >
                 <td>{idx + 1}</td>
-                <td>{item.partName}</td>
                 <td>{item.category}</td>
+                <td>{item.partName}</td>
                 <td>{item.description}</td>
                 <td style={{ position: 'relative' }}>
                   {item.rate}
